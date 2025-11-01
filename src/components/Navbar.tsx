@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import FeedbackButton from "@/components/FeedbackButton";
 
 const nav = [
   { href: "/about", label: "About" },
@@ -32,7 +33,10 @@ export default function Navbar() {
             );
           })}
         </nav>
-        <Link href="/book" className="btn-accent">Book Now</Link>
+        <div className="flex items-center gap-2">
+          <FeedbackButton variant="form" label="Feedback" />
+          <Link href="/book" className="btn-accent">Book Now</Link>
+        </div>
       </div>
     </header>
   );
