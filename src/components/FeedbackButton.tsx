@@ -6,9 +6,10 @@ type Props = {
   variant?: "mailto" | "form";
   className?: string;
   label?: string;
+  appearance?: "button" | "link";
 };
 
-export default function FeedbackButton({ variant = "mailto", className = "", label = "Feedback" }: Props) {
+export default function FeedbackButton({ variant = "mailto", className = "", label = "Feedback", appearance = "button" }: Props) {
   const pathname = usePathname();
   const email = process.env.NEXT_PUBLIC_FEEDBACK_EMAIL || "hello@example.com";
   const formBase = process.env.NEXT_PUBLIC_FEEDBACK_FORM || "";
@@ -24,12 +25,13 @@ export default function FeedbackButton({ variant = "mailto", className = "", lab
 
   const href = variant === "mailto" ? mailtoHref : formHref;
 
+  const baseClass = appearance === "link" ? "link-underline" : "btn-outline";
   return (
     <a
       href={href}
       target={variant === "form" ? "_blank" : undefined}
       rel={variant === "form" ? "noreferrer" : undefined}
-      className={`btn-outline ${className}`}
+      className={`${baseClass} ${className}`}
     >
       {label}
     </a>
