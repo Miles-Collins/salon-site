@@ -1,23 +1,21 @@
+// src/components/GlossGeniusWidget.tsx
 "use client";
-
-import { useEffect } from "react";
+import Script from "next/script";
 
 export default function GlossGeniusWidget() {
-  useEffect(() => {
-    const script = document.createElement("script");
-  script.src = "https://static.glossgenius.com/gg-booking.js";
-  script.setAttribute("data-gg-embed", "https://porschacradic.glossgenius.com");
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
   return (
     <div className="w-full">
-      {/* GlossGenius injects its embed content here automatically */}
+      <div
+        data-gg-embed="https://porschacradic.glossgenius.com"
+        className="min-h-[900px]"
+      />
+      <Script
+        id="gg-booking"
+        src="https://static.glossgenius.com/gg-booking.js"
+        strategy="afterInteractive"
+        // ↓ this reduces what your browser sends as the referrer
+        referrerPolicy="no-referrer"
+      />
     </div>
   );
 }
