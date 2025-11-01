@@ -5,8 +5,8 @@ import { useEffect } from "react";
 export default function GlossGeniusWidget() {
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = "https://static.glossgenius.com/gg-booking.js";
-    script.setAttribute("data-gg-embed", "https://glossgenius.com/stylist/porschacradic");
+  script.src = "https://static.glossgenius.com/gg-booking.js";
+  script.setAttribute("data-gg-embed", "https://porschacradic.glossgenius.com");
     script.async = true;
     document.body.appendChild(script);
 
