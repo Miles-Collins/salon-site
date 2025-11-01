@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import ContactBar from "@/components/ContactBar";
 
 export const metadata: Metadata = {
   title: "Hair by Porscha",
@@ -19,11 +18,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased">
-  <Navbar />
-  <main>{children}</main>
-  <Footer />
-  <ContactBar />
+      <body className="min-h-screen antialiased flex flex-col">
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
       </body>
     </html>
   );

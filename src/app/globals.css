@@ -12,7 +12,7 @@ html, body { background: var(--bg); color: var(--fg); }
 .btn-accent { @apply inline-flex items-center justify-center rounded-2xl bg-brand-accent text-black px-5 py-3 font-semibold shadow-soft hover:opacity-90; }
 .btn-outline { @apply inline-flex items-center justify-center rounded-2xl border border-black/10 px-5 py-3 font-medium hover:bg-black/5; }
 .card { @apply rounded-2xl bg-white shadow-soft ring-1 ring-black/5; }
-.section { @apply py-14 lg:py-20; }
+.section { @apply px-4 sm:px-6 py-14 lg:py-20; }
 .h1 { @apply text-4xl lg:text-5xl font-bold tracking-tight; }
 .h2 { @apply text-3xl font-semibold tracking-tight; }
 .muted { @apply text-black/70; }

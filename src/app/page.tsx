@@ -12,7 +12,7 @@ export default function HomePage() {
           className="absolute inset-0 w-full h-full object-cover object-center opacity-80"
         />
         <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-black/60 to-black/20" />
-        <div className="relative z-10 text-center w-full px-0 md:px-4 flex flex-col items-center justify-center h-full">
+  <div className="relative z-10 text-center w-full px-4 md:px-4 flex flex-col items-center justify-center h-full">
           <h1 className="text-5xl md:text-7xl font-semibold leading-tight mb-8">
             <span className="block text-outline-white font-light tracking-wide">HAIR BY</span>
             <span className="block text-cheetah">PORSCHA</span>

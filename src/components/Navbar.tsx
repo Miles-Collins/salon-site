@@ -28,7 +28,7 @@ export default function Navbar() {
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300
         ${scrolled ? "bg-black/90 border-b border-black/30 shadow-lg backdrop-blur" : "bg-gradient-to-b from-black/60 to-transparent border-none"}`}
     >
-      <div className="w-full flex h-16 items-center px-0 md:px-6">
+  <div className="w-full flex h-16 items-center px-4 sm:px-5 md:px-6">
         <Link href="/" className="font-semibold tracking-tight">
           <span className="text-white drop-shadow">Hair</span> <span className="text-brand-accent drop-shadow">by Porscha</span>
         </Link>

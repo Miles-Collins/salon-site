@@ -6,7 +6,7 @@ export default function GlossGeniusWidget() {
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://static.glossgenius.com/gg-booking.js";
-    script.setAttribute("data-gg-embed", "https://glossgenius.com/stylist/YOUR_SLUG");
+    script.setAttribute("data-gg-embed", "https://glossgenius.com/stylist/porschacradic");
     script.async = true;
     document.body.appendChild(script);
 
