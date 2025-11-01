@@ -3,6 +3,8 @@ import Link from "next/link";
 import { serviceCategories } from "@/data/services";
 import CategoryNav from "@/components/CategoryNav";
 import { Dancing_Script } from "next/font/google";
+import Image from "next/image";
+import servicesHero from "../../../public/services-hero.jpg";
 
 const dancing = Dancing_Script({ subsets: ["latin"], weight: ["700"] });
 
@@ -12,10 +14,15 @@ export default function ServicesPage() {
     <Section>
       {/* Mini Hero Section */}
   <div id="services-hero" className="relative w-full h-[360px] md:h-[460px] mb-12 flex items-center overflow-hidden">
-        <img
-          src="/services-hero.jpg"
+        <Image
+          src={servicesHero}
           alt="Hair coloring in salon"
-          className="absolute inset-0 w-full h-full object-cover object-center z-0"
+          fill
+          priority
+          placeholder="blur"
+          className="absolute inset-0 object-cover object-center z-0"
+          sizes="(min-width: 1280px) 1280px, 100vw"
+          quality={70}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-10" />
         <div className="relative z-20 w-full">

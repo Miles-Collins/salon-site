@@ -1,15 +1,22 @@
 import Link from "next/link";
 import Section from "@/components/Section";
+import Image from "next/image";
+import heroImg from "../../public/hero.jpg";
 
 export default function HomePage() {
   return (
     <>
       {/* HERO - full viewport with image and overlay */}
   <div className="relative w-full h-screen min-h-screen flex items-center justify-center overflow-hidden">
-        <img
-          src="/hero.jpg"
+        <Image
+          src={heroImg}
           alt="Salon interior"
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-80"
+          fill
+          priority
+          placeholder="blur"
+          className="absolute inset-0 object-cover object-center opacity-80"
+          sizes="(min-width: 1280px) 1280px, 100vw"
+          quality={70}
         />
         <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-black/60 to-black/20" />
   <div className="relative z-10 text-center w-full px-4 md:px-4 flex flex-col items-center justify-center h-full">
