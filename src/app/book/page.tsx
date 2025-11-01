@@ -1,13 +1,18 @@
-import GlossGeniusWidget from "@/components/GlossGeniusWidget";
-import Section from "@/components/Section";
+import Link from "next/link";
 
 export default function BookPage() {
   return (
-    <Section>
-      <h1 className="h2">Book with Porscha</h1>
-      <div className="card p-4 mt-6">
-        <GlossGeniusWidget />
+    <section className="space-y-6">
+      <div className="card p-8 mt-10 text-center">
+        <Link
+          href="https://porschacradic.glossgenius.com/services"
+          className="btn-accent"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Open Booking
+        </Link>
       </div>
-    </Section>
+    </section>
   );
 }

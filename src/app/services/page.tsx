@@ -1,24 +1,61 @@
 import Section from "@/components/Section";
-import ServiceCard from "@/components/ServiceCard";
 import Link from "next/link";
+import { serviceCategories } from "@/data/services";
+import CategoryNav from "@/components/CategoryNav";
+import { Dancing_Script } from "next/font/google";
 
-const services = [
-  { name: "Women's Cut", price: 65, time: "45–60 min", desc: "Wash, cut, style." },
-  { name: "Men's Cut", price: 45, time: "30–45 min", desc: "Wash, cut, style." },
-  { name: "Root Touch-Up", price: 85, time: "60–75 min", desc: "Gray coverage or root refresh." },
-  { name: "Full Color", price: 140, time: "120 min", desc: "Single-process full color." },
-  { name: "Partial Highlights", price: 160, time: "120–150 min", desc: "Dimensional lightening." },
-  { name: "Deep Treatment", price: 40, time: "20 min", desc: "Repair & hydration add-on." },
-];
+const dancing = Dancing_Script({ subsets: ["latin"], weight: ["700"] });
 
 export default function ServicesPage() {
+  const categories = serviceCategories;
   return (
     <Section>
-      <h1 className="h2">Services & Hours</h1>
-      <p className="mt-2 muted">Pricing may vary by hair length/density.</p>
+      {/* Mini Hero Section */}
+  <div id="services-hero" className="relative w-full h-[360px] md:h-[460px] mb-12 flex items-center overflow-hidden">
+        <img
+          src="/services-hero.jpg"
+          alt="Hair coloring in salon"
+          className="absolute inset-0 w-full h-full object-cover object-center z-0"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-10" />
+        <div className="relative z-20 w-full">
+          <div className="pl-6 sm:pl-10 md:pl-16 py-8 text-left">
+            <span className={`${dancing.className} block text-white/95 text-5xl md:text-6xl lg:text-7xl mb-3 tracking-wide`}>Premium</span>
+            <h1 className="text-white text-5xl md:text-7xl font-extrabold tracking-tight">SERVICES</h1>
+          </div>
+        </div>
+      </div>
+      {/* Sticky category nav with scrollspy */}
+  <CategoryNav titles={categories.map((c) => c.title)} appearAfterId="services-hero" />
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((s) => <ServiceCard key={s.name} {...s} />)}
+      <h1 className="sr-only">Services</h1>
+      <div className="space-y-24">
+        {categories.map((cat) => (
+          <section key={cat.title} id={cat.title.replace(/\s+/g, '-')}
+            className="relative bg-gray-50 rounded-xl overflow-hidden px-2 py-12 scroll-mt-24">
+            <div className="relative z-10 flex flex-col md:flex-row gap-8 md:gap-16 max-w-5xl mx-auto">
+              {/* Left: Category Title */}
+              <div className="md:w-1/3 flex-shrink-0 flex items-start">
+                <h2 className="text-3xl font-extrabold uppercase tracking-tight text-black leading-tight md:text-left text-center mb-2">{cat.title}</h2>
+              </div>
+              {/* Right: Service List */}
+              <div className="md:w-2/3 w-full">
+                <ul className="space-y-8">
+                  {cat.items.map((svc) => (
+                    <li key={svc.name} className="flex flex-col">
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold uppercase text-black text-sm md:text-base tracking-wide whitespace-nowrap">{svc.name}</span>
+                        <span aria-hidden="true" className="flex-1 border-t border-black/10" />
+                        <span className="text-sm md:text-base font-medium text-black whitespace-nowrap">${svc.price} &amp; up</span>
+                      </div>
+                      <p className="text-sm text-black/60 mt-1">{svc.desc}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+        ))}
       </div>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">

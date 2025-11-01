@@ -5,6 +5,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Script/cursive display font utility for hero accents */
+.font-script {
+	font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", "Dancing Script", cursive;
+	font-weight: 400;
+}
+
+/* Smooth scrolling for on-page anchor navigation */
+html { scroll-behavior: smooth; }
+
+/* Hide scrollbars on overflow containers where we only need touch/trackpad scroll */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; }
+
 :root { --bg: #ffffff; --fg: #0b0b0b; }
 html, body { background: var(--bg); color: var(--fg); }
 .container { @apply mx-auto max-w-6xl px-4; }
