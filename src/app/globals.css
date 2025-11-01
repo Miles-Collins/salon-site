@@ -1,3 +1,6 @@
+.text-cheetah:hover {
+		cursor: url('/leopard-cursor.png') 16 16, pointer;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -38,41 +41,14 @@ html, body { background: var(--bg); color: var(--fg); }
 }
 
 /* Cheetah-print text fill using layered radial gradients */
+
 .text-cheetah {
-}
-.text-cheetah:hover {
-	text-shadow: 0 0 16px rgba(255,255,255,0.7), 0 0 32px rgba(255,255,255,0.4);
-	--tan: #d6b179;
-	--brown: #8b5e34;
-	--brown2: #6b3e1f;
-	background-color: var(--tan);
-	background-image:
-		radial-gradient(circle at 12% 20%, var(--brown2) 0 7px, transparent 7.5px),
-		radial-gradient(circle at 25% 35%, var(--brown) 0 9px, transparent 9.5px),
-		radial-gradient(circle at 40% 60%, var(--brown2) 0 8px, transparent 8.5px),
-		radial-gradient(circle at 65% 25%, var(--brown) 0 10px, transparent 10.5px),
-		radial-gradient(circle at 78% 75%, var(--brown2) 0 9px, transparent 9.5px),
-		radial-gradient(circle at 12% 75%, var(--brown) 0 8px, transparent 8.5px),
-		radial-gradient(circle at 85% 45%, var(--brown2) 0 7px, transparent 7.5px),
-		radial-gradient(circle at 55% 10%, var(--brown) 0 9px, transparent 9.5px);
-	background-size: 220px 220px;
-	background-repeat: repeat;
+	background: url('/cheetah-print.jpg') repeat;
+	background-size: cover;
+	color: transparent;
 	-webkit-background-clip: text;
 	background-clip: text;
-	color: transparent;
-	-webkit-text-stroke: 1px rgba(255,255,255,0.35);
+	font-weight: 900;
+	-webkit-text-stroke: 2.5px #111;
 }
-.text-cheetah {
-			background: url('/cheetah-print.jpg') repeat;
-			background-size: cover;
-			color: transparent;
-			-webkit-background-clip: text;
-			background-clip: text;
-			font-weight: 900;
-			-webkit-text-stroke: 2.5px #111;
-		}
-
-		.text-cheetah:hover {
-			text-shadow: 0 4px 12px rgba(255,255,255,0.7);
-		}
 
