@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Transparent or beige background -->
+  <rect width="400" height="400" fill="#E8DDD0"/>
+  
+  <!-- Scissors and Brush Icon centered -->
+  <g transform="translate(200, 200)">
+    <!-- Left scissor blade with cheetah print pattern -->
+    <path d="M-60,-90 L-75,-45 L-52,-38 L-37,-83 Z" fill="#1a1a1a"/>
+    <ellipse cx="-64" cy="-64" rx="6" ry="9" fill="#C9A961"/>
+    <ellipse cx="-56" cy="-71" rx="5" ry="7" fill="#1a1a1a"/>
+    <ellipse cx="-68" cy="-56" rx="5" ry="8" fill="#1a1a1a"/>
+    
+    <!-- Right scissor blade -->
+    <path d="M60,-90 L75,-45 L52,-38 L37,-83 Z" fill="#1a1a1a"/>
+    
+    <!-- Scissor handles (rings) -->
+    <circle cx="-45" cy="-30" r="12" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="45" cy="-30" r="12" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+    
+    <!-- Cross point -->
+    <circle cx="0" cy="-60" r="5" fill="#1a1a1a"/>
+    
+    <!-- Brush handle -->
+    <rect x="30" y="-22" width="15" height="60" fill="#1a1a1a"/>
+    
+    <!-- Brush bristles with gold color -->
+    <path d="M26,38 Q37,52 37,68 Q37,82 33,90 L41,90 Q37,82 37,68 Q37,52 48,38 Z" fill="#C9A961"/>
+    <!-- Bristle details -->
+    <path d="M30,40 L31,55 L32,70 L33,82" stroke="#1a1a1a" stroke-width="1.2"/>
+    <path d="M34,40 L35,58 L36,73 L37,82" stroke="#1a1a1a" stroke-width="1.2"/>
+    <path d="M37,40 L38,58 L39,73 L40,82" stroke="#1a1a1a" stroke-width="1.2"/>
+    <path d="M41,40 L42,55 L43,70 L44,82" stroke="#1a1a1a" stroke-width="1.2"/>
+  </g>
+</svg>

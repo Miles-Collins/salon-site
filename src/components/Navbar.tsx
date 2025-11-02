@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const nav = [
   { href: "/about", label: "About" },
@@ -49,8 +50,18 @@ export default function Navbar() {
           </svg>
         </button>
 
-        <Link href="/" className="font-semibold tracking-tight">
-          <span className="text-white drop-shadow">Hair</span> <span className="text-brand-accent drop-shadow">by Porscha</span>
+        <Link href="/" className="flex items-center gap-2 group">
+          <Image 
+            src="/color-rebel-icon.svg" 
+            alt="Color Rebel by Porscha logo" 
+            width={40} 
+            height={40}
+            className="drop-shadow-lg"
+          />
+          <span className="hidden sm:inline">
+            <span className="text-white drop-shadow font-semibold tracking-tight">Color Rebel</span>{" "}
+            <span className="text-brand-accent drop-shadow font-semibold tracking-tight">by Porscha</span>
+          </span>
         </Link>
         <div className="ml-auto flex items-center gap-6">
           <nav className="hidden gap-4 md:flex">

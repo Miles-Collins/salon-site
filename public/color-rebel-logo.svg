@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Beige background -->
+  <rect width="1024" height="1024" fill="#E8DDD0"/>
+  
+  <!-- Scissors and Brush Icon -->
+  <g transform="translate(512, 280)">
+    <!-- Left scissor blade with cheetah print -->
+    <path d="M-80,-120 L-100,-60 L-70,-50 L-50,-110 Z" fill="#1a1a1a"/>
+    <ellipse cx="-85" cy="-85" rx="8" ry="12" fill="#C9A961"/>
+    <ellipse cx="-75" cy="-95" rx="6" ry="9" fill="#1a1a1a"/>
+    <ellipse cx="-90" cy="-75" rx="7" ry="10" fill="#1a1a1a"/>
+    
+    <!-- Right scissor blade -->
+    <path d="M80,-120 L100,-60 L70,-50 L50,-110 Z" fill="#1a1a1a"/>
+    
+    <!-- Scissor handles -->
+    <circle cx="-60" cy="-40" r="15" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+    <circle cx="60" cy="-40" r="15" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+    
+    <!-- Brush handle -->
+    <rect x="40" y="-30" width="20" height="80" fill="#1a1a1a"/>
+    
+    <!-- Brush bristles -->
+    <path d="M35,50 Q50,70 50,90 Q50,110 45,120 L55,120 Q50,110 50,90 Q50,70 65,50 Z" fill="#C9A961"/>
+    <path d="M40,55 L42,75 L44,95 L46,110" stroke="#1a1a1a" stroke-width="1.5"/>
+    <path d="M45,55 L47,80 L49,100 L50,110" stroke="#1a1a1a" stroke-width="1.5"/>
+    <path d="M50,55 L52,80 L54,100 L55,110" stroke="#1a1a1a" stroke-width="1.5"/>
+    <path d="M55,55 L57,75 L59,95 L60,110" stroke="#1a1a1a" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Text: COLOR REBEL -->
+  <text x="512" y="600" font-family="serif" font-size="120" font-weight="bold" fill="#C9A961" text-anchor="middle">COLOR REBEL</text>
+  
+  <!-- Text: BY PORSCHA -->
+  <text x="512" y="720" font-family="serif" font-size="72" font-weight="normal" fill="#1a1a1a" text-anchor="middle">BY PORSCHA</text>
+</svg>
