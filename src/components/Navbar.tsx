@@ -52,7 +52,7 @@ export default function Navbar() {
 
         <Link href="/" className="flex items-center gap-2 group">
           <Image 
-            src="/color-rebel-icon.svg" 
+            src="/ColorRebelTransparent.png" 
             alt="Color Rebel by Porscha logo" 
             width={40} 
             height={40}

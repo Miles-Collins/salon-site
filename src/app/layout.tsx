@@ -9,9 +9,13 @@ export const metadata: Metadata = {
   openGraph: {
   title: "Color Rebel by Porscha",
     description: "Effortless beauty made simple. Book your appointment today.",
-    images: ["/og-image.jpg"],
+    images: ["/ColorRebelTransparent.png"],
   },
   twitter: { card: "summary_large_image" },
+  icons: {
+    icon: "/ColorRebelTransparent.png",
+    apple: "/ColorRebelTransparent.png",
+  },
 };
 
 
