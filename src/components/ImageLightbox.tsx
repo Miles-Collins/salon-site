@@ -19,7 +19,7 @@ export default function ImageLightbox({ images, currentIndex, onClose }: ImageLi
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
       if (e.key === "ArrowLeft") handlePrevious();
       if (e.key === "ArrowRight") handleNext();
       if (e.key === "f" || e.key === "F") toggleFullscreen();
@@ -47,6 +47,14 @@ export default function ImageLightbox({ images, currentIndex, onClose }: ImageLi
     }
   };
 
+  const handleClose = () => {
+    // Exit fullscreen if active before closing
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
       {/* Fullscreen toggle button */}
@@ -68,7 +76,7 @@ export default function ImageLightbox({ images, currentIndex, onClose }: ImageLi
 
       {/* Close button */}
       <button
-        onClick={onClose}
+        onClick={handleClose}
         className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 transition z-50"
         aria-label="Close lightbox"
       >
@@ -115,7 +123,7 @@ export default function ImageLightbox({ images, currentIndex, onClose }: ImageLi
       {/* Click outside to close */}
       <div
         className="absolute inset-0 -z-10"
-        onClick={onClose}
+        onClick={handleClose}
       />
     </div>
   );
