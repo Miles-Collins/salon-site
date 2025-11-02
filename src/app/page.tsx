@@ -20,18 +20,8 @@ export default function HomePage() {
           quality={70}
         />
         <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-black/60 to-black/20" />
-  <div className="relative z-10 text-center w-full px-4 md:px-4 flex flex-col items-center justify-center h-full">
-          {/* Logo */}
-          <div className="mb-8">
-            <Image
-              src={logoImg}
-              alt="Color Rebel by Porscha"
-              width={300}
-              height={300}
-              className="drop-shadow-2xl"
-              priority
-            />
-          </div>
+  <div className="relative z-10 text-center w-full px-4 md:px-4 flex-col items-center justify-center h-full hidden md:flex">
+          {/* Text only - no logo on tablet/desktop */}
           <h1 className="text-5xl md:text-7xl font-semibold leading-tight mb-8">
             <span className="block text-outline-white font-light tracking-wide">COLOR REBEL BY</span>
             <span className="block text-cheetah">PORSCHA</span>
