@@ -4,10 +4,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Hair by Porscha",
+  title: "Color Rebel by Porscha",
   description: "Book your next style or color session with Porscha — effortless beauty made simple.",
   openGraph: {
-    title: "Hair by Porscha",
+  title: "Color Rebel by Porscha",
     description: "Effortless beauty made simple. Book your appointment today.",
     images: ["/og-image.jpg"],
   },

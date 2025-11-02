@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 pb-8">
         {/* Brand/About */}
         <div>
-          <div className="text-3xl font-light tracking-wide mb-2">Hair by Porscha</div>
+          <div className="text-3xl font-light tracking-wide mb-2">Color Rebel by Porscha</div>
           <p className="text-white/80 mb-4 text-sm">Effortless beauty, expert care, and a relaxing studio experience. Book online or reach out with questions!</p>
           <div className="flex gap-4 mb-4">
             <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram">
@@ -22,7 +22,14 @@ export default function Footer() {
         {/* Contact */}
         <div>
           <div className="font-bold text-lg mb-2">CONTACT</div>
-          <div className="text-white/80 text-sm mb-2">123 Main St, Your City, CA 90210</div>
+          <a
+            href="https://www.google.com/maps/search/?api=1&query=301+S+5TH+ST+LEAVENWORTH+KS+66048"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/80 text-sm mb-2 underline"
+          >
+            301 S 5TH ST., LEAVENWORTH, KS 66048
+          </a>
           <a href="tel:5551234567" className="block text-white/80 text-sm mb-2">(555) 123-4567</a>
           <a href="mailto:hello@porscha.salon" className="block text-white/80 text-sm mb-2">Email Us</a>
         </div>
@@ -31,17 +38,17 @@ export default function Footer() {
           <div className="font-bold text-lg mb-2">INFO</div>
           <div className="grid grid-cols-2 gap-x-4 text-white/80 text-sm">
             <div>Monday</div><div>Closed</div>
-            <div>Tuesday</div><div>10AM - 6PM</div>
-            <div>Wednesday</div><div>10AM - 6PM</div>
-            <div>Thursday</div><div>10AM - 6PM</div>
-            <div>Friday</div><div>10AM - 6PM</div>
-            <div>Saturday</div><div>10AM - 6PM</div>
+            <div>Tuesday</div><div>12 PM - 8 PM</div>
+            <div>Wednesday</div><div>Closed</div>
+            <div>Thursday</div><div>11 AM - 8 PM</div>
+            <div>Friday</div><div>10 AM - 5 PM</div>
+            <div>Saturday</div><div>9 AM - 4 PM</div>
             <div>Sunday</div><div>Closed</div>
           </div>
         </div>
       </div>
       <div className="border-t border-white/10 pt-3 pb-1 text-center text-xs text-white/60">
-        © {new Date().getFullYear()} Hair by Porscha &nbsp;|&nbsp; <a href="/terms" className="underline">Terms and Conditions</a> &nbsp;|&nbsp; <a href="/privacy" className="underline">Privacy Policy</a>
+  © {new Date().getFullYear()} Color Rebel by Porscha &nbsp;|&nbsp; <a href="/terms" className="underline">Terms and Conditions</a> &nbsp;|&nbsp; <a href="/privacy" className="underline">Privacy Policy</a>
       </div>
     </footer>
   );
