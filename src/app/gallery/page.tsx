@@ -1,16 +1,17 @@
 import Section from "@/components/Section";
 import Image from "next/image";
 
-// Add your Gatsby Studios images to the public/gallery folder
-// Then list them here
+// Gallery images from Gatsby Studios
 const galleryImages = [
-  { src: "/gallery/image1.jpg", alt: "Salon interior" },
-  { src: "/gallery/image2.jpg", alt: "Hair styling" },
-  { src: "/gallery/image3.jpg", alt: "Color treatment" },
-  { src: "/gallery/image4.jpg", alt: "Salon workspace" },
-  { src: "/gallery/image5.jpg", alt: "Hair color results" },
-  { src: "/gallery/image6.jpg", alt: "Styling station" },
-  // Add more images as needed
+  { src: "/gallery/2025-10-09.webp", alt: "Color Rebel salon work" },
+  { src: "/gallery/2025-10-12.webp", alt: "Hair styling at Color Rebel" },
+  { src: "/gallery/2025-10-13.webp", alt: "Color treatment results" },
+  { src: "/gallery/2025-10-133.webp", alt: "Salon styling work" },
+  { src: "/gallery/2025-10-134.webp", alt: "Hair color transformation" },
+  { src: "/gallery/2025-10-135.webp", alt: "Professional hair styling" },
+  { src: "/gallery/2025-10-136.webp", alt: "Color Rebel hair work" },
+  { src: "/gallery/2025-10-137.webp", alt: "Salon color results" },
+  { src: "/gallery/2025-10-138.webp", alt: "Hair transformation" },
 ];
 
 export default function GalleryPage() {
