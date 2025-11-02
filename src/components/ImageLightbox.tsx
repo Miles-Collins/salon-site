@@ -11,6 +11,7 @@ interface ImageLightboxProps {
 
 export default function ImageLightbox({ images, currentIndex, onClose }: ImageLightboxProps) {
   const [index, setIndex] = useState(currentIndex);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     setIndex(currentIndex);
@@ -21,6 +22,7 @@ export default function ImageLightbox({ images, currentIndex, onClose }: ImageLi
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowLeft") handlePrevious();
       if (e.key === "ArrowRight") handleNext();
+      if (e.key === "f" || e.key === "F") toggleFullscreen();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -35,8 +37,35 @@ export default function ImageLightbox({ images, currentIndex, onClose }: ImageLi
     setIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+      {/* Fullscreen toggle button */}
+      <button
+        onClick={toggleFullscreen}
+        className="absolute top-4 left-4 text-white hover:text-gray-300 transition z-50"
+        aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+      >
+        {isFullscreen ? (
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+          </svg>
+        ) : (
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+          </svg>
+        )}
+      </button>
+
       {/* Close button */}
       <button
         onClick={onClose}
