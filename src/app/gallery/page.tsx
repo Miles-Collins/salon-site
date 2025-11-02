@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
+import ImageLightbox from "@/components/ImageLightbox";
 
 // Gallery images from Gatsby Studios
 const galleryImages = [
@@ -14,6 +18,17 @@ const galleryImages = [
 ];
 
 export default function GalleryPage() {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+  };
   return (
     <div className="min-h-screen bg-white pt-20">
       {/* Header */}
@@ -27,9 +42,10 @@ export default function GalleryPage() {
       {/* Masonry Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[200px] gap-2">
         {galleryImages.map((image, index) => (
-          <div 
-            key={index} 
-            className={`relative overflow-hidden group ${image.span}`}
+          <button
+            key={index}
+            onClick={() => openLightbox(index)}
+            className={`relative overflow-hidden group ${image.span} cursor-pointer`}
           >
             <Image
               src={image.src}
@@ -39,9 +55,18 @@ export default function GalleryPage() {
               sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-          </div>
+          </button>
         ))}
       </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <ImageLightbox
+          images={galleryImages}
+          currentIndex={currentImageIndex}
+          onClose={closeLightbox}
+        />
+      )}
     </div>
   );
 }
