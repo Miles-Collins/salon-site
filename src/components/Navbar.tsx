@@ -88,6 +88,7 @@ export default function Navbar() {
             ${mobileOpen ? "opacity-100 scale-y-100 max-h-[70vh]" : "opacity-0 scale-y-0 max-h-0 pointer-events-none"}`}
         >
           <div className="py-3">
+            <Link href="/" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm border-b border-black/10">Home</Link>
             {nav.map((item, idx) => (
               <Link
                 key={item.href}
