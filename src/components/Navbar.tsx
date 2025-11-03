@@ -54,8 +54,8 @@ export default function Navbar() {
           <span className="text-white drop-shadow font-light tracking-[0.15em] text-lg sm:text-xl">COLOR REBEL</span>
           <span className="text-white/60 drop-shadow font-light text-lg sm:text-xl">|</span>
           <span className="text-white/80 drop-shadow font-light tracking-[0.15em] text-sm sm:text-base flex flex-col leading-tight">
-            <span>L</span>
-            <span>V</span>
+            <span>P</span>
+            <span>C</span>
           </span>
         </Link>
         <div className="ml-auto flex items-center gap-6">
