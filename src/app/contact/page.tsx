@@ -15,12 +15,12 @@ export default function ContactPage() {
         <div className="card p-6">
           <h3 className="text-lg font-semibold">Location</h3>
           <p className="mt-2 text-sm text-black/70">
-            123 Salon St, Suite 200<br />Your City, CA 90000
+            301 S 5TH ST., LEAVENWORTH, KS 66048
           </p>
           <div className="mt-4">
             <a
               className="btn-outline"
-              href="https://maps.google.com"
+              href="https://www.google.com/maps/search/?api=1&query=301+S+5TH+ST+LEAVENWORTH+KS+66048"
               target="_blank" rel="noreferrer"
             >
               Open in Maps
