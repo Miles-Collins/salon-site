@@ -9,7 +9,7 @@ export default function ContactPage() {
           <h3 className="text-lg font-semibold">Get in touch</h3>
           <p className="mt-2 text-sm text-black/70">
             Email: <a className="underline" href="mailto:hello@hairbyporscha.com">hello@hairbyporscha.com</a><br />
-            Phone: (555) 123-4567
+            Phone: (913) 680-7987
           </p>
         </div>
         <div className="card p-6">

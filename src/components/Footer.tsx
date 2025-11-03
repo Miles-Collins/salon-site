@@ -43,7 +43,7 @@ export default function Footer() {
               301 S 5TH ST., LEAVENWORTH, KS 66048
             </a>
             <div className="space-x-4">
-              <a href="tel:5551234567" className="hover:text-brand-accent">(555) 123-4567</a>
+              <a href="tel:9136807987" className="hover:text-brand-accent">(913) 680-7987</a>
               <span className="text-white/30">|</span>
               <a href="mailto:hello@porscha.salon" className="hover:text-brand-accent">hello@porscha.salon</a>
             </div>

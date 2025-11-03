@@ -74,7 +74,7 @@ export default function HomePage() {
               <span className="font-semibold">Email:</span> <a href="mailto:hello@porscha.salon" className="text-brand-accent underline">hello@porscha.salon</a>
             </div>
             <div>
-              <span className="font-semibold">Phone:</span> <a href="tel:5551234567" className="text-brand-accent underline">(555) 123-4567</a>
+              <span className="font-semibold">Phone:</span> <a href="tel:9136807987" className="text-brand-accent underline">(913) 680-7987</a>
             </div>
             <div>
               <span className="font-semibold">Location:</span> <a href="https://maps.google.com/?q=Your+Salon+Address" target="_blank" rel="noopener" className="text-brand-accent underline">123 Main St, Your City</a>
