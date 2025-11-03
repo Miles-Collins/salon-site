@@ -25,10 +25,10 @@ export default function HomePage() {
           <Image
             src={logoImg}
             alt="Color Rebel by Porscha logo"
-            width={220}
-            height={220}
+            width={300}
+            height={300}
             priority
-            className="w-40 xs:w-48 sm:w-56 h-auto drop-shadow-2xl"
+            className="w-64 xs:w-72 sm:w-80 h-auto drop-shadow-2xl"
           />
         </div>
   <div className="relative z-10 text-center w-full px-4 md:px-4 flex-col items-center justify-center h-full hidden md:flex">
