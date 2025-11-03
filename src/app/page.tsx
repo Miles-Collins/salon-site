@@ -63,25 +63,6 @@ export default function HomePage() {
           <Link href="/services" className="btn-outline">View All Services</Link>
         </div>
       </Section>
-
-      {/* Contact/Location Section */}
-      <Section className="py-12">
-        <div className="max-w-2xl mx-auto card p-8 text-center">
-          <h2 className="h2 mb-2">Contact & Location</h2>
-          <p className="muted mb-4">Text or email for questions, or book online anytime.</p>
-          <div className="space-y-2">
-            <div>
-              <span className="font-semibold">Email:</span> <a href="mailto:hello@porscha.salon" className="text-brand-accent underline">hello@porscha.salon</a>
-            </div>
-            <div>
-              <span className="font-semibold">Phone:</span> <a href="tel:9136807987" className="text-brand-accent underline">(913) 680-7987</a>
-            </div>
-            <div>
-              <span className="font-semibold">Location:</span> <a href="https://www.google.com/maps/search/?api=1&query=301+S+5TH+ST+LEAVENWORTH+KS+66048" target="_blank" rel="noopener" className="text-brand-accent underline">301 S 5TH ST., LEAVENWORTH, KS 66048</a>
-            </div>
-          </div>
-        </div>
-      </Section>
     </>
   );
 }
