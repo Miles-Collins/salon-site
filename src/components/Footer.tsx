@@ -66,7 +66,7 @@ export default function Footer() {
             <div>Wed</div><div>Closed</div>
             <div>Thu</div><div>11 AM – 8 PM</div>
             <div>Fri</div><div>10 AM – 5 PM</div>
-            <div>Sat</div><div>9 AM – 4 PM</div>
+            <div>Sat</div><div>9 AM – 4 PM<span className="text-xs block text-white/60">(1st Sat only)</span></div>
             <div>Sun</div><div>Closed</div>
           </div>
         </div>
