@@ -11,7 +11,7 @@ type Props = {
 
 export default function FeedbackButton({ variant = "mailto", className = "", label = "Feedback", appearance = "button" }: Props) {
   const pathname = usePathname();
-  const email = process.env.NEXT_PUBLIC_FEEDBACK_EMAIL || "hello@example.com";
+  const email = process.env.NEXT_PUBLIC_FEEDBACK_EMAIL || "PorschaCradic@gmail.com";
   const formBase = process.env.NEXT_PUBLIC_FEEDBACK_FORM || "";
 
   // Include current page in the subject/body or form prefill

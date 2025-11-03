@@ -8,7 +8,7 @@ export default function ContactPage() {
         <div className="card p-6">
           <h3 className="text-lg font-semibold">Get in touch</h3>
           <p className="mt-2 text-sm text-black/70">
-            Email: <a className="underline" href="mailto:hello@hairbyporscha.com">hello@hairbyporscha.com</a><br />
+            Email: <a className="underline" href="mailto:PorschaCradic@gmail.com">PorschaCradic@gmail.com</a><br />
             Phone: (913) 680-7987
           </p>
         </div>

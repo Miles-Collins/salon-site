@@ -29,7 +29,7 @@ export default function Footer() {
             <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" className="hover:text-brand-accent transition">
               <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h5v-7h-2v-3h2V9a3 3 0 0 1 3-3h2v3h-2v3h2v7h2a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5z" strokeWidth="2"/></svg>
             </a>
-            <a href="mailto:hello@porscha.salon" aria-label="Email" className="hover:text-brand-accent transition">
+            <a href="mailto:PorschaCradic@gmail.com" aria-label="Email" className="hover:text-brand-accent transition">
               <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="7" width="18" height="10" rx="2" strokeWidth="2"/><path d="M3 7l9 6 9-6" strokeWidth="2"/></svg>
             </a>
           </div>
@@ -45,7 +45,7 @@ export default function Footer() {
             <div className="space-x-4">
               <a href="tel:9136807987" className="hover:text-brand-accent">(913) 680-7987</a>
               <span className="text-white/30">|</span>
-              <a href="mailto:hello@porscha.salon" className="hover:text-brand-accent">hello@porscha.salon</a>
+              <a href="mailto:PorschaCradic@gmail.com" className="hover:text-brand-accent">PorschaCradic@gmail.com</a>
             </div>
             <div>
               <Link href="/book" className="underline font-semibold hover:text-brand-accent">BOOK ONLINE</Link>

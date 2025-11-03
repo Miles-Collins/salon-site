@@ -7,7 +7,7 @@ export default function ContactBar() {
         <div className="flex items-center gap-4">
           <a href="tel:9136807987" className="font-semibold text-brand hover:text-brand-accent transition">(913) 680-7987</a>
           <span className="text-black/30">|</span>
-          <a href="mailto:hello@porscha.salon" className="font-semibold text-brand hover:text-brand-accent transition">hello@porscha.salon</a>
+          <a href="mailto:PorschaCradic@gmail.com" className="font-semibold text-brand hover:text-brand-accent transition">PorschaCradic@gmail.com</a>
         </div>
         <Link href="/book" className="btn-accent px-4 py-2 rounded-full text-sm font-semibold shadow-soft">Book Now</Link>
       </div>
