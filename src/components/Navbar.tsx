@@ -51,12 +51,16 @@ export default function Navbar() {
         </button>
 
         <Link href="/" className="flex items-center gap-0.5 group">
-          <span className="text-white drop-shadow font-light tracking-[0.15em] text-lg sm:text-xl">COLOR REBEL</span>
-          <span className="text-white/60 drop-shadow font-light text-lg sm:text-xl">|</span>
-          <span className="text-white/80 drop-shadow font-light tracking-[0.15em] text-sm sm:text-base flex flex-col leading-tight">
-            <span>P</span>
-            <span>C</span>
-          </span>
+            {/* Mobile: Full text */}
+            <span className="md:hidden text-white drop-shadow font-light tracking-wide text-base">Color Rebel by Porscha</span>
+          
+            {/* Desktop: COLOR REBEL | PC */}
+            <span className="hidden md:inline text-white drop-shadow font-light tracking-[0.15em] text-lg sm:text-xl">COLOR REBEL</span>
+            <span className="hidden md:inline text-white/60 drop-shadow font-light text-lg sm:text-xl">|</span>
+            <span className="hidden md:flex text-white/80 drop-shadow font-light tracking-[0.15em] text-sm sm:text-base flex-col leading-tight">
+              <span>P</span>
+              <span>C</span>
+            </span>
         </Link>
         <div className="ml-auto flex items-center gap-6">
           <nav className="hidden gap-4 md:flex">
