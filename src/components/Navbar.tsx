@@ -102,10 +102,10 @@ export default function Navbar() {
               aria-haspopup="menu"
               aria-expanded={bookOpen ? 'true' : 'false'}
               onClick={() => setBookOpen((v) => !v)}
-              className="group text-white text-sm font-semibold uppercase tracking-wide link-underline flex items-center gap-1"
+              className="group text-white text-sm font-semibold uppercase tracking-wide flex items-center gap-1"
             >
-              Book
-              <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" className={`transition-transform ${bookOpen ? "rotate-180" : ""}`}>
+              <span className="link-underline leading-none">Book</span>
+              <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" className={`mt-[1px] transition-transform ${bookOpen ? "rotate-180" : ""}`}>
                 <path d="M5.25 7.5L10 12.25L14.75 7.5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
               </svg>
             </button>
