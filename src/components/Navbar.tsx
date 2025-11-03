@@ -10,12 +10,14 @@ const nav = [
   { href: "/contact", label: "Contact" },
 ];
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [bookOpen, setBookOpen] = useState(false);
+  const bookRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -29,6 +31,25 @@ export default function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
+
+  // Close book dropdown on outside click or route change
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (!bookRef.current) return;
+      if (!bookRef.current.contains(e.target as Node)) {
+        setBookOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setBookOpen(false);
+    };
+    document.addEventListener("click", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("click", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
 
   return (
     <header
@@ -74,8 +95,34 @@ export default function Navbar() {
               );
             })}
           </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/book" className="group text-white text-sm font-semibold uppercase tracking-wide link-underline">Book Now</Link>
+          <div className="flex items-center gap-4 relative" ref={bookRef}
+               onMouseEnter={() => setBookOpen(true)} onMouseLeave={() => setBookOpen(false)}>
+            <button
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={bookOpen ? 'true' : 'false'}
+              onClick={() => setBookOpen((v) => !v)}
+              className="group text-white text-sm font-semibold uppercase tracking-wide link-underline flex items-center gap-1"
+            >
+              Book
+              <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" className={`transition-transform ${bookOpen ? "rotate-180" : ""}`}>
+                <path d="M5.25 7.5L10 12.25L14.75 7.5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/>
+              </svg>
+            </button>
+            {/* Dropdown */}
+            <div
+              className={`absolute right-0 top-10 bg-white text-black rounded-md shadow-xl border border-black/10 overflow-hidden transform origin-top transition-all duration-200 ${bookOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+            >
+              <a
+                href="https://porschacradic.glossgenius.com/services"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block whitespace-nowrap px-4 py-3 text-sm hover:bg-black/5"
+              >
+                Book on GlossGenius
+              </a>
+              <Link href="/book" className="block whitespace-nowrap px-4 py-3 text-sm hover:bg-black/5">Booking Info Page</Link>
+            </div>
           </div>
         </div>
         {/* Mobile dropdown panel with smooth animation */}
