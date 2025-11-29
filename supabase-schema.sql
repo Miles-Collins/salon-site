@@ -60,3 +60,6 @@ create table if not exists metrics_daily (
 );
 
 alter table clients add column if not exists total_spend numeric default 0;
+
+
+//test
