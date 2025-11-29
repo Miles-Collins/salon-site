@@ -32,7 +32,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-screen antialiased flex flex-col">
-        <ClerkProvider publishableKey={publishableKey}>{content}</ClerkProvider>
+        <ClerkProvider
+          publishableKey={publishableKey}
+          clerkJSUrl="https://cdn.clerk.com/clerk.js"
+          clerkJSVersion="latest"
+        >
+          {content}
+        </ClerkProvider>
       </body>
     </html>
   );
