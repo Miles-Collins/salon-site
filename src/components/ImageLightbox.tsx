@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 interface ImageLightboxProps {
@@ -10,8 +10,36 @@ interface ImageLightboxProps {
 }
 
 export default function ImageLightbox({ images, currentIndex, onClose }: ImageLightboxProps) {
+
   const [index, setIndex] = useState(currentIndex);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // useCallback to ensure stable references for useEffect dependencies
+  const handleNext = React.useCallback(() => {
+    setIndex((prev) => (prev + 1) % images.length);
+  }, [images.length]);
+
+  const handlePrevious = React.useCallback(() => {
+    setIndex((prev) => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
+
+  const toggleFullscreen = React.useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  }, []);
+
+  const handleClose = React.useCallback(() => {
+    // Exit fullscreen if active before closing
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
+    onClose();
+  }, [onClose]);
 
   useEffect(() => {
     setIndex(currentIndex);
@@ -27,33 +55,7 @@ export default function ImageLightbox({ images, currentIndex, onClose }: ImageLi
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [index]);
-
-  const handleNext = () => {
-    setIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const handlePrevious = () => {
-    setIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    }
-  };
-
-  const handleClose = () => {
-    // Exit fullscreen if active before closing
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    }
-    onClose();
-  };
+  }, [handleClose, handleNext, handlePrevious, toggleFullscreen]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">

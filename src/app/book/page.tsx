@@ -17,7 +17,7 @@ export default function BookPage() {
           Book Now on GlossGenius
         </Link>
         <p className="text-sm text-black/60 mt-6">
-          You'll be redirected to our secure booking page
+          You&apos;ll be redirected to our secure booking page
         </p>
       </div>
     </section>
