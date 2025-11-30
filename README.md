@@ -1,114 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+**Salon Site** is a Next.js App Router project for Porscha’s Salon with a public marketing site, booking links, gallery, policies, and an owner-only dashboard for uploading GlossGenius reports and viewing business metrics.
 
-## Getting Started
+**Stack**
+- Next.js 15 (App Router) + TypeScript
+- Tailwind CSS
+- Supabase (Postgres) for data + SQL in `supabase-schema.sql`
+- Clerk (auth) with owner allowlist
+- CSV parsing via PapaParse; charts via Recharts; validation via Zod
 
-First, run the development server:
+**Quick Start**
+- Install: `npm install`
+- Dev: `npm run dev` then visit `http://localhost:3000`
+- Owner dashboard: `http://localhost:3000/owner/dashboard` (requires auth/allowlist)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Environment Variables**
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anon key
+- `SUPABASE_SERVICE_ROLE_KEY`: Optional service role (server-only)
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Clerk publishable key
+- `CLERK_SECRET_KEY`: Clerk secret key
+- `OWNER_ALLOWED_EMAILS`: Comma-separated owner emails (server)
+- `NEXT_PUBLIC_OWNER_ALLOWED_EMAILS`: Comma-separated owner emails (client)
+  - Single-value variants also supported: `OWNER_ALLOWED_EMAIL`, `NEXT_PUBLIC_OWNER_ALLOWED_EMAIL`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create a `.env.local` in the repo root and populate the above before running locally.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Supabase Setup**
+- Create a Supabase project, open SQL editor, run `supabase-schema.sql` from repo root.
+- Tables include `appointments`, `payments`, and derived metrics helpers.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Auth (Clerk) & Owner Gate**
+- Create a Clerk application and set the Clerk env vars.
+- Restrict access by setting `OWNER_ALLOWED_EMAILS` and `NEXT_PUBLIC_OWNER_ALLOWED_EMAILS`.
+- The owner area uses `src/app/owner/layout.tsx` and client gate in `src/app/owner/dashboard/ui/OwnerGate.tsx`.
 
-## Learn More
+**Upload & Metrics**
+- Upload GlossGenius CSVs (Appointments or Payments) in `/owner/dashboard`.
+- API route `POST /api/owner/upload` ingests CSV and upserts into Supabase.
+- KPIs computed and displayed in `src/app/owner/dashboard/page.tsx` using helpers in `src/lib/reportProcessing.ts`.
 
-To learn more about Next.js, take a look at the following resources:
+**Key Paths**
+- `src/app/page.tsx`: Home page
+- `src/app/services/page.tsx`: Services
+- `src/app/gallery/page.tsx`: Gallery (uses images under `public/gallery/`)
+- `src/app/policies/page.tsx`: Policies
+- `src/app/book/page.tsx`: Booking CTA
+- `src/app/owner/dashboard/page.tsx`: Owner dashboard
+- `src/app/api/owner/upload/route.ts`: CSV ingest API
+- `src/app/api/owner/metrics/route.ts`: Metrics API
+- `src/lib/supabase.ts`: Supabase client
+- `src/lib/authz.ts`: Owner authorization helpers
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
----
-
-## Owner Dashboard (/owner/dashboard)
-
-This project now includes an owner-only dashboard for uploading GlossGenius CSV reports (Appointments & Payments) and viewing KPIs + charts.
-
-### 1. Install New Dependencies
-
+**Run Locally**
 ```cmd
 npm install
-```
-
-Added packages: `@supabase/supabase-js`, `papaparse`, `recharts`, `zod`, `@clerk/nextjs`, `@types/papaparse`.
-
-### 2. Supabase Setup
-1. Create a new Supabase project.
-2. In the SQL editor run `supabase-schema.sql` from repo root.
-3. Create a service role key (copy) and set env vars in `.env.local`:
-	- `NEXT_PUBLIC_SUPABASE_URL`
-	- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-	- `SUPABASE_SERVICE_ROLE_KEY` (only needed for privileged server ops; currently unused but reserved).
-
-### 3. Clerk (Authentication)
-1. Create a Clerk application.
-2. Set env vars:
-	- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-	- `CLERK_SECRET_KEY`
-3. Restrict access to specific emails (owner allowlist):
-	- Set `OWNER_ALLOWED_EMAILS` to a comma-separated list, e.g.
-	  `OWNER_ALLOWED_EMAILS=owner@gmail.com,sister@gmail.com`
-	- `OWNER_ALLOWED_EMAIL` is still supported (single email).
-	 - For client-side gate (UI redirect), also set public vars:
-		 - `NEXT_PUBLIC_OWNER_ALLOWED_EMAILS` (same list)
-		 - or `NEXT_PUBLIC_OWNER_ALLOWED_EMAIL` (single email)
-4. Visit `/owner/dashboard` while signed in. Without Clerk keys, the page will still render (development convenience).
-
-### 4. Upload Flow
-1. Export CSV from GlossGenius (Appointments or Payments report).
-2. In `/owner/dashboard` use the Upload Latest Report section.
-3. Backend route: `POST /api/owner/upload` parses CSV via PapaParse and upserts rows into `appointments` or `payments` tables.
-
-### 5. Metrics Computed
-- This Month's Revenue: Sum of `payments.amount` for current calendar month.
-- This Week's Appointments: Count of `appointments` in last 7 days.
-- Average Ticket: (Revenue from this weeks appointments) / (Appointment count).
-- Revenue (Last 6 Months): Line chart aggregating payment totals by month.
-- Upcoming / Recent Appointments: Earliest 10 appointments ordered by `start_time`.
-- New vs Returning Clients (Week/Month): Derived from first appearance of `client_id` in `appointments` vs existing `clients` table.
-- Top Client Month Spend: Highest cumulative spend for a single client within current month.
-- Top Clients (All-Time Spend): Table ordered by `clients.total_spend` (top 5).
-
-### 6. GlossGenius Deep Link
-Button links to `GLOSS_GENIUS_DASHBOARD_URL` (defaults to `https://app.glossgenius.com`). Override in `.env.local`.
-
-### 7. Future Enhancements
-- Distinguish new vs returning clients (needs client history — add client table ingest if present in CSV).
-- Persist client loyalty metrics (total spend) via payments rollup.
-- Add rolling 90-day spend trend per top client.
-- Optimize client spend updates with Postgres functions to reduce per-row round trips.
-- Incremental metrics materialization (use `metrics_daily` table).
-- Error & success toast notifications.
-- Role-based auth guard with Clerk server-side middleware.
-- Storage of raw CSV in Supabase Storage for audit.
-- Automatic detection of report type from headers.
-
-### 8. Troubleshooting
-- "Cannot find module" errors: Run `npm install` after pulling changes.
-- Empty metrics: Upload at least one payments CSV.
-- Timezone issues: Ensure GlossGenius export includes ISO timestamps; adjust parsing if needed.
-
-### 9. Dev Commands
-```cmd
 npm run dev
 ```
-Open `http://localhost:3000/owner/dashboard`.
+Visit `http://localhost:3000`.
 
----
+**Deploy**
+- Vercel recommended. Add env vars to the Vercel project.
+- Ensure Supabase and Clerk are configured in the deployed environment.
+
+**Troubleshooting**
+- Missing modules: run `npm install` after pulling.
+- Metrics empty: upload a Payments CSV via dashboard.
+- Timezone parsing: ensure exports include ISO timestamps; adjust parser in `reportProcessing.ts` if needed.
+
+**Project Goals / Roadmap**
+- Enrich client history to distinguish new vs returning clients.
+- Materialize rolling daily metrics to improve dashboard performance.
+- Store raw CSVs in Supabase Storage for auditing.
+- Harden server-side auth checks and error handling.
