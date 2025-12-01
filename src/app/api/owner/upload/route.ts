@@ -5,6 +5,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { getAllowedEmails, isEmailAllowed } from '@/lib/authz';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {

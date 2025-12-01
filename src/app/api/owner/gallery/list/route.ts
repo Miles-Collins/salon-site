@@ -4,6 +4,8 @@ import { isOwner } from "@/lib/authz";
 
 const bucket = "gallery";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   // Server-side owner check
   if (!(await isOwner())) {

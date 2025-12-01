@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isOwner } from "@/lib/authz";
 
+export const dynamic = 'force-dynamic';
+
 export async function PATCH(req: Request) {
   if (!(await isOwner())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

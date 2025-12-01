@@ -4,6 +4,8 @@ import { isOwner } from "@/lib/authz";
 
 const bucket = "gallery";
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   if (!(await isOwner())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
