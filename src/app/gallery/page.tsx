@@ -5,7 +5,7 @@ import Image from "next/image";
 import ImageLightbox from "@/components/ImageLightbox";
 
 // Gallery images from Gatsby Studios
-type GItem = { src: string; alt: string; span?: string };
+type GItem = { src: string; alt: string; span?: string; caption?: string | null; display_order?: number | null; created_at?: string };
 
 const fallbackImages: GItem[] = [
   { src: "/gallery/2025-10-09.webp", alt: "Color Rebel salon work", span: "col-span-2 row-span-2" },
@@ -30,7 +30,19 @@ export default function GalleryPage() {
         const res = await fetch("/api/owner/gallery/list");
         if (!res.ok) return; // fall back silently
         const json = await res.json();
-        const items: GItem[] = (json.items || []).map((i: any) => ({ src: i.url, alt: i.name }));
+        const items: GItem[] = (json.items || []).map((i: any) => ({
+          src: i.url,
+          alt: i.caption || i.name,
+          caption: i.caption || null,
+          display_order: i.display_order ?? null,
+          created_at: i.created_at,
+        }));
+        items.sort((a, b) => {
+          const ao = a.display_order ?? Number.MAX_SAFE_INTEGER;
+          const bo = b.display_order ?? Number.MAX_SAFE_INTEGER;
+          if (ao !== bo) return ao - bo;
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+        });
         if (items.length) setImages(items);
       } catch {}
     };

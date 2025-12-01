@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { clerkClient } from "@clerk/nextjs/server";
-import { isOwner } from "@/src/lib/authz";
+import { isOwner } from "@/lib/authz";
 
 const bucket = "gallery";
 
 export async function GET() {
-  // Server-side owner check via Clerk
-  const user = await clerkClient().users.getUserList({ limit: 1 }); // placeholder; better to use auth in middleware
-  // Fallback: allow if env owner email exists; actual middleware should ensure auth
+  // Server-side owner check
   if (!(await isOwner())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -28,12 +25,31 @@ export async function GET() {
   }
 
   const publicBase = supabase.storage.from(bucket).getPublicUrl("").data.publicUrl;
-  const items = (data || []).map((f) => ({
-    name: f.name,
-    id: f.id,
-    created_at: (f as any).created_at,
-    url: `${publicBase}/${encodeURIComponent(f.name)}`,
-  }));
+
+  // Fetch metadata rows
+  const { data: metaRows } = await supabase
+    .from("gallery_images")
+    .select("name, caption, tags, display_order, created_at");
+  const metaMap = new Map((metaRows || []).map((m) => [m.name, m]));
+
+  const items = (data || [])
+    .map((f) => {
+      const meta = metaMap.get(f.name);
+      return {
+        name: f.name,
+        created_at: (meta?.created_at as any) || (f as any).created_at,
+        url: `${publicBase}/${encodeURIComponent(f.name)}`,
+        caption: meta?.caption || null,
+        tags: meta?.tags || [],
+        display_order: meta?.display_order ?? null,
+      };
+    })
+    .sort((a, b) => {
+      const ao = a.display_order ?? Number.MAX_SAFE_INTEGER;
+      const bo = b.display_order ?? Number.MAX_SAFE_INTEGER;
+      if (ao !== bo) return ao - bo;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
 
   return NextResponse.json({ items });
 }

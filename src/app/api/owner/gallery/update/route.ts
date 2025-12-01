@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isOwner } from "@/lib/authz";
 
-const bucket = "gallery";
-
 export async function POST(request: Request) {
   if (!(await isOwner())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -14,15 +12,25 @@ export async function POST(request: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const body = await request.json().catch(() => null) as { name?: string } | null;
+  const body = await request.json().catch(() => null) as {
+    name: string;
+    caption?: string | null;
+    tags?: string[];
+    display_order?: number | null;
+  } | null;
+
   if (!body?.name) {
-    return NextResponse.json({ error: "Missing file name" }, { status: 400 });
+    return NextResponse.json({ error: "Missing name" }, { status: 400 });
   }
 
-  const { error } = await supabase.storage.from(bucket).remove([body.name]);
+  const { error } = await supabase.from("gallery_images").upsert({
+    name: body.name,
+    caption: body.caption ?? null,
+    tags: Array.isArray(body.tags) ? body.tags : [],
+    display_order: typeof body.display_order === "number" ? body.display_order : null,
+  });
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
   return NextResponse.json({ ok: true });
 }

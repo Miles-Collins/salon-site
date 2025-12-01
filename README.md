@@ -38,6 +38,18 @@ Create a `.env.local` in the repo root and populate the above before running loc
 - API route `POST /api/owner/upload` ingests CSV and upserts into Supabase.
 - KPIs computed and displayed in `src/app/owner/dashboard/page.tsx` using helpers in `src/lib/reportProcessing.ts`.
 
+**Gallery Curation**
+- Supabase Storage bucket: `gallery` (public read recommended)
+- Metadata table: `gallery_images` (run from `supabase-schema.sql`)
+  - Columns: `name` (PK, storage filename), `caption`, `tags text[]`, `display_order int`, `created_at timestamptz`
+- Owner dashboard widget: `GalleryManager.tsx` lets you upload, set caption, tags, and display order, and delete.
+- API endpoints:
+  - `GET /api/owner/gallery/list` — returns storage files merged with metadata, sorted by `display_order` then `created_at`.
+  - `POST /api/owner/gallery/upload` — multipart upload with optional `caption`, `tags` (comma-separated), `display_order`.
+  - `POST /api/owner/gallery/update` — update `caption`, `tags`, `display_order` for `name`.
+  - `POST /api/owner/gallery/delete` — remove storage object and metadata row.
+- Public page `src/app/gallery/page.tsx` prefers Supabase data and falls back to `public/gallery`.
+
 **Key Paths**
 - `src/app/page.tsx`: Home page
 - `src/app/services/page.tsx`: Services

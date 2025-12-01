@@ -62,4 +62,33 @@ create table if not exists metrics_daily (
 alter table clients add column if not exists total_spend numeric default 0;
 
 
-//test
+-- Gallery curation metadata
+create table if not exists public.gallery_images (
+  name text primary key, -- matches storage object name
+  caption text,
+  tags text[] default '{}',
+  display_order int default null, -- lower first; null means unsorted
+  created_at timestamptz default now()
+);
+
+create index if not exists gallery_images_order_created_idx
+  on public.gallery_images (display_order asc nulls last, created_at desc);
+
+alter table public.gallery_images enable row level security;
+do $$ begin
+  create policy "gallery read" on public.gallery_images
+    for select using (true);
+exception when others then null; end $$;
+
+-- Lightweight CMS content storage
+create table if not exists public.site_content (
+  key text primary key, -- e.g., 'hero', 'announcement', 'policies'
+  value jsonb not null default '{}'::jsonb,
+  updated_at timestamptz default now()
+);
+
+alter table public.site_content enable row level security;
+do $$ begin
+  create policy "content read" on public.site_content
+    for select using (true);
+exception when others then null; end $$;

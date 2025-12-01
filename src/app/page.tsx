@@ -3,8 +3,26 @@ import Section from "@/components/Section";
 import Image from "next/image";
 import heroImg from "../../public/hero.jpg";
 import logoImg from "../../public/ColorRebelTransparent.png";
+import { createClient } from "@supabase/supabase-js";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+async function getContent() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+  const { data } = await supabase.from("site_content").select("key, value");
+  const map: Record<string, any> = {};
+  (data || []).forEach((row: any) => (map[row.key] = row.value));
+  return map as { hero?: { title?: string; subtitle?: string }; announcement?: { enabled?: boolean; text?: string } };
+}
+
+export default async function HomePage() {
+  const content = await getContent();
+  const heroTitle = content.hero?.title || "COLOR REBEL BY";
+  const heroSubtitle = content.hero?.subtitle || "PORSCHA";
+  const announcement = content.announcement;
   return (
     <>
       {/* HERO - full viewport with image and overlay */}
@@ -34,8 +52,8 @@ export default function HomePage() {
   <div className="relative z-10 text-center w-full px-4 md:px-4 flex-col items-center justify-center h-full hidden md:flex">
           {/* Text only - no logo on tablet/desktop */}
           <h1 className="text-5xl md:text-7xl font-semibold leading-tight mb-8">
-            <span className="block text-outline-white font-light tracking-wide">COLOR REBEL BY</span>
-            <span className="block text-cheetah">PORSCHA</span>
+            <span className="block text-outline-white font-light tracking-wide">{heroTitle}</span>
+            <span className="block text-cheetah">{heroSubtitle}</span>
           </h1>
           <Link
             href="/book"
@@ -45,6 +63,12 @@ export default function HomePage() {
           </Link>
         </div>
       </div>
+
+      {announcement?.enabled && announcement?.text && (
+        <div className="bg-black text-white text-center py-2">
+          <span className="text-sm">{announcement.text}</span>
+        </div>
+      )}
 
       {/* About/Intro Section */}
       <Section className="py-12">
