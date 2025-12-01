@@ -5,6 +5,11 @@ import React from "react";
 export const dynamic = "force-dynamic";
 
 async function getPoliciesMarkdown() {
+  // If env vars are missing (e.g., during build without Supabase), return undefined
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return undefined;
+  }
+  
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

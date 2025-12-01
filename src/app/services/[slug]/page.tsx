@@ -41,15 +41,23 @@ type ServiceDetail = {
 export const dynamic = "force-dynamic";
 
 export default async function ServiceDetailPage({ params }: { params: { slug: string } }) {
-  const supabase = getSupabaseClient();
+  let service = null;
   
-  const { data: service } = await supabase
-    .from("service_details")
-    .select("*")
-    .eq("slug", params.slug)
-    .eq("is_published", true)
-    .single();
-
+  try {
+    const supabase = getSupabaseClient();
+    
+    const { data } = await supabase
+      .from("service_details")
+      .select("*")
+      .eq("slug", params.slug)
+      .eq("is_published", true)
+      .single();
+    
+    service = data;
+  } catch (error) {
+    // During build or if Supabase unavailable, service will be null
+  }
+  
   // If no database record, try to find from static data
   if (!service) {
     let foundService = null;

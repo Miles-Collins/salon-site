@@ -25,6 +25,11 @@ export const metadata = {
 };
 
 async function getContent() {
+  // If env vars are missing (e.g., during build without Supabase), return defaults
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return {};
+  }
+  
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
