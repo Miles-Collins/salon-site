@@ -3,9 +3,14 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 // Protect owner routes and ensure Clerk attaches auth context
 const isProtectedRoute = createRouteMatcher(['/owner(.*)']);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
+  // Skip auth checks during build time (when Clerk keys are not available)
+  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    return;
+  }
+  
   if (isProtectedRoute(req)) {
-    auth().protect();
+    await auth().protect();
   }
 });
 
