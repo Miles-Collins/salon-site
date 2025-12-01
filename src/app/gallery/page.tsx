@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import ImageLightbox from "@/components/ImageLightbox";
 
 // Gallery images from Gatsby Studios
-const galleryImages = [
+type GItem = { src: string; alt: string; span?: string };
+
+const fallbackImages: GItem[] = [
   { src: "/gallery/2025-10-09.webp", alt: "Color Rebel salon work", span: "col-span-2 row-span-2" },
   { src: "/gallery/2025-10-12.webp", alt: "Hair styling at Color Rebel", span: "col-span-1 row-span-1" },
   { src: "/gallery/2025-10-13.webp", alt: "Color treatment results", span: "col-span-1 row-span-1" },
@@ -20,6 +22,20 @@ const galleryImages = [
 export default function GalleryPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [images, setImages] = useState<GItem[]>(fallbackImages);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch("/api/owner/gallery/list");
+        if (!res.ok) return; // fall back silently
+        const json = await res.json();
+        const items: GItem[] = (json.items || []).map((i: any) => ({ src: i.url, alt: i.name }));
+        if (items.length) setImages(items);
+      } catch {}
+    };
+    load();
+  }, []);
 
   const openLightbox = (index: number) => {
     setCurrentImageIndex(index);
@@ -41,11 +57,12 @@ export default function GalleryPage() {
       
       {/* Masonry Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[200px] gap-2">
-        {galleryImages.map((image, index) => (
+        {images.map((image, index) => (
           <button
             key={index}
             onClick={() => openLightbox(index)}
             className={`relative overflow-hidden group ${image.span} cursor-pointer`}
+            aria-label={`View image ${image.alt || image.src}`}
           >
             <Image
               src={image.src}
@@ -62,7 +79,7 @@ export default function GalleryPage() {
       {/* Lightbox */}
       {lightboxOpen && (
         <ImageLightbox
-          images={galleryImages}
+          images={images}
           currentIndex={currentImageIndex}
           onClose={closeLightbox}
         />
