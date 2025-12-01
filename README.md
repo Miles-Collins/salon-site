@@ -21,8 +21,10 @@
 - `OWNER_ALLOWED_EMAILS`: Comma-separated owner emails (server)
 - `NEXT_PUBLIC_OWNER_ALLOWED_EMAILS`: Comma-separated owner emails (client)
   - Single-value variants also supported: `OWNER_ALLOWED_EMAIL`, `NEXT_PUBLIC_OWNER_ALLOWED_EMAIL`
+- `NEXT_PUBLIC_GOOGLE_PLACE_ID`: (Optional) Google Place ID for reviews integration
+- `NEXT_PUBLIC_FEEDBACK_EMAIL`: Contact email for feedback
 
-Create a `.env.local` in the repo root and populate the above before running locally.
+Create a `.env.local` in the repo root and populate the above before running locally. See `.env.example` for template.
 
 **Supabase Setup**
 - Create a Supabase project, open SQL editor, run `supabase-schema.sql` from repo root.

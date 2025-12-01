@@ -1,7 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-type Item = { name: string; url: string; caption?: string | null; tags?: string[]; display_order?: number | null };
+type Item = { 
+  name: string; 
+  url: string; 
+  caption?: string | null; 
+  tags?: string[]; 
+  display_order?: number | null;
+  is_before_after?: boolean;
+  before_image?: string | null;
+};
 
 export default function GalleryManager() {
   const [items, setItems] = useState<Item[]>([]);
@@ -79,6 +87,8 @@ export default function GalleryManager() {
           caption: it.caption ?? null,
           tags: it.tags ?? [],
           display_order: typeof it.display_order === "number" ? it.display_order : null,
+          is_before_after: it.is_before_after ?? false,
+          before_image: it.before_image ?? null,
         }),
       });
       if (!res.ok) throw new Error("Save failed");
@@ -146,6 +156,30 @@ export default function GalleryManager() {
                   placeholder="e.g. 1"
                 />
               </div>
+              <div className="flex items-center gap-2 py-2">
+                <input
+                  id={`before-after-${it.name}`}
+                  type="checkbox"
+                  checked={it.is_before_after || false}
+                  onChange={(e) => updateItem(it.name, { is_before_after: e.target.checked })}
+                />
+                <label htmlFor={`before-after-${it.name}`} className="text-xs text-gray-700 cursor-pointer">
+                  Before/After Transformation
+                </label>
+              </div>
+              {it.is_before_after && (
+                <div>
+                  <label className="block text-xs text-gray-600">Before Image (filename)</label>
+                  <input
+                    type="text"
+                    className="w-full border rounded px-2 py-1"
+                    value={it.before_image || ""}
+                    onChange={(e) => updateItem(it.name, { before_image: e.target.value })}
+                    placeholder="e.g. before-photo.jpg"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Enter the filename of the before image (must be already uploaded)</p>
+                </div>
+              )}
               <div className="flex justify-end gap-2">
                 <button className="px-3 py-1 border rounded" onClick={() => onSave(it)} title="Save changes">Save</button>
               </div>

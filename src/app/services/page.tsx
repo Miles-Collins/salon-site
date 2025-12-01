@@ -39,7 +39,12 @@ export default function ServicesPage() {
       <div className="space-y-24">
         {categories.map((cat) => (
           <section key={cat.title} id={cat.title.replace(/\s+/g, '-')}
-            className="relative bg-gray-50 rounded-xl overflow-hidden px-2 py-12 scroll-mt-24">
+            className="relative bg-gray-50 overflow-hidden px-2 py-12 scroll-mt-24"
+            style={{
+              borderTop: '0.5px solid black',
+              borderBottom: '0.5px solid black',
+              boxShadow: 'inset 0 2px 0 0 #d4af37, inset 0 -2px 0 0 #d4af37'
+            }}>
             <div className="relative z-10 flex flex-col md:flex-row gap-8 md:gap-16 max-w-5xl mx-auto">
               {/* Left: Category Title */}
               <div className="md:w-1/3 flex-shrink-0 flex items-start">
@@ -50,12 +55,25 @@ export default function ServicesPage() {
                 <ul className="space-y-8">
                   {cat.items.map((svc) => (
                     <li key={svc.name} className="flex flex-col">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold uppercase text-black text-sm md:text-base tracking-wide whitespace-nowrap">{svc.name}</span>
-                        <span aria-hidden="true" className="flex-1 border-t border-black/10" />
-                        <span className="text-sm md:text-base font-medium text-black whitespace-nowrap">${svc.price} &amp; up</span>
-                      </div>
-                      <p className="text-sm text-black/60 mt-1">{svc.desc}</p>
+                      {svc.slug ? (
+                        <Link href={`/services/${svc.slug}`} className="group">
+                          <div className="flex items-center gap-3">
+                            <span className="font-bold uppercase text-black text-sm md:text-base tracking-wide whitespace-nowrap group-hover:text-gold transition-colors">{svc.name}</span>
+                            <span aria-hidden="true" className="flex-1 border-t border-black/10" />
+                            <span className="text-sm md:text-base font-medium text-black whitespace-nowrap">${svc.price} &amp; up</span>
+                          </div>
+                          <p className="text-sm text-black/60 mt-1 group-hover:text-black/80 transition-colors">{svc.desc}</p>
+                        </Link>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-3">
+                            <span className="font-bold uppercase text-black text-sm md:text-base tracking-wide whitespace-nowrap">{svc.name}</span>
+                            <span aria-hidden="true" className="flex-1 border-t border-black/10" />
+                            <span className="text-sm md:text-base font-medium text-black whitespace-nowrap">${svc.price} &amp; up</span>
+                          </div>
+                          <p className="text-sm text-black/60 mt-1">{svc.desc}</p>
+                        </>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -63,22 +81,6 @@ export default function ServicesPage() {
             </div>
           </section>
         ))}
-      </div>
-
-      <div className="mt-10 grid gap-4 sm:grid-cols-2">
-        <div className="card p-6">
-          <h3 className="text-lg font-semibold">Hours</h3>
-          <ul className="mt-3 text-sm text-black/70">
-            <li>Mon–Fri: 10:00a–6:00p</li>
-            <li>Sat: 9:00a–3:00p</li>
-            <li>Sun: Closed</li>
-          </ul>
-        </div>
-        <div className="card p-6">
-          <h3 className="text-lg font-semibold">Booking</h3>
-          <p className="mt-2 text-sm text-black/70">Book online — instant confirmation & reminders.</p>
-          <Link href="/book" className="mt-4 inline-block btn-accent">Book Now</Link>
-        </div>
       </div>
     </Section>
   );

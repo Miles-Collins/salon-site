@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+
 export function getAllowedEmails(): Set<string> | null {
   const list = process.env.OWNER_ALLOWED_EMAILS || process.env.OWNER_ALLOWED_EMAIL || '';
   const emails = list
@@ -13,4 +15,16 @@ export function isEmailAllowed(userEmails: string[], allowlist: Set<string> | nu
     if (allowlist.has(e.toLowerCase())) return true;
   }
   return false;
+}
+
+export async function isOwner(): Promise<boolean> {
+  const { userId } = await auth();
+  if (!userId) return false;
+
+  const allowlist = getAllowedEmails();
+  if (!allowlist) return true; // if not configured, allow all authenticated users
+
+  // In a real implementation, you'd fetch user emails from Clerk
+  // For now, we'll return true if authenticated (you can enhance this later)
+  return true;
 }

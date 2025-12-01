@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import ImageLightbox from "@/components/ImageLightbox";
+import { supabaseThumb } from "@/lib/image";
 
 // Gallery images from Gatsby Studios
 type GItem = { src: string; alt: string; span?: string; caption?: string | null; display_order?: number | null; created_at?: string };
@@ -77,7 +78,7 @@ export default function GalleryPage() {
             aria-label={`View image ${image.alt || image.src}`}
           >
             <Image
-              src={image.src}
+              src={supabaseThumb(image.src, 600, 70)}
               alt={image.alt}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"

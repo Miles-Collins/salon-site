@@ -4,8 +4,25 @@ import Image from "next/image";
 import heroImg from "../../public/hero.jpg";
 import logoImg from "../../public/ColorRebelTransparent.png";
 import { createClient } from "@supabase/supabase-js";
+import GoogleReviews from "@/components/GoogleReviews";
+import FAQAccordion from "@/components/FAQAccordion";
 
 export const dynamic = "force-dynamic";
+export const metadata = {
+  title: "Color Rebel by Porscha | Leavenworth Hair Salon",
+  description: "One-on-one salon experience specializing in vivid color, extensions, and precision styling. Book online.",
+  openGraph: {
+    title: "Color Rebel by Porscha",
+    description: "Vivid color, extensions, and precision styling in Leavenworth, KS.",
+    url: "https://colorrebelbyporscha.com/",
+    siteName: "Color Rebel by Porscha",
+    images: [
+      { url: "https://colorrebelbyporscha.com/api/og?page=home", width: 1200, height: 630, alt: "Color Rebel by Porscha" }
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+};
 
 async function getContent() {
   const supabase = createClient(
@@ -25,6 +42,52 @@ export default async function HomePage() {
   const announcement = content.announcement;
   return (
     <>
+      {/* Schema.org LocalBusiness */}
+      <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "HairSalon",
+          name: "Color Rebel by Porscha",
+          image: "https://colorrebelbyporscha.com/hero-og.jpg",
+          url: "https://colorrebelbyporscha.com/",
+          telephone: "+1-913-680-7987",
+          email: "PorschaCradic@gmail.com",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "301 S 5th St",
+            addressLocality: "Leavenworth",
+            addressRegion: "KS",
+            postalCode: "66048",
+            addressCountry: "US"
+          },
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: "Tuesday",
+              opens: "12:00",
+              closes: "20:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: "Thursday",
+              opens: "11:00",
+              closes: "20:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: "Friday",
+              opens: "10:00",
+              closes: "17:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: "Saturday",
+              opens: "09:00",
+              closes: "16:00"
+            }
+          ]
+        })
+      }} />
       {/* HERO - full viewport with image and overlay */}
   <div className="relative w-full h-screen min-h-screen flex items-center justify-center overflow-hidden">
         <Image
@@ -98,6 +161,106 @@ export default async function HomePage() {
           <Link href="/services" className="btn-outline">View All Services</Link>
         </div>
       </Section>
+
+      {/* Testimonials Section */}
+      <TestimonialsSection />
+
+      {/* FAQ Section */}
+      <FAQSection />
     </>
+  );
+}
+
+async function FAQSection() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data } = await supabase
+    .from("faqs")
+    .select("id, question, answer, category")
+    .eq("is_published", true)
+    .order("display_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  const faqs = data || [];
+
+  if (faqs.length === 0) return null;
+
+  // Generate FAQPage JSON-LD schema
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq: any) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <Section className="py-16">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="h2 text-center mb-12">Frequently Asked Questions</h2>
+          <FAQAccordion faqs={faqs} />
+        </div>
+      </Section>
+    </>
+  );
+}
+
+async function TestimonialsSection() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data } = await supabase
+    .from("testimonials")
+    .select("*")
+    .eq("is_featured", true)
+    .order("display_order", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  const testimonials = data || [];
+
+  if (testimonials.length === 0) return null;
+
+  return (
+    <Section className="py-16 bg-gray-50">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="h2 text-center mb-12">What Our Clients Say</h2>
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {testimonials.map((t: any) => (
+            <div key={t.id} className="card p-6 bg-white">
+              {t.rating && (
+                <div className="text-brand-accent text-lg mb-3">
+                  {"★".repeat(t.rating)}{"☆".repeat(5 - t.rating)}
+                </div>
+              )}
+              <p className="text-gray-700 italic mb-4">&ldquo;{t.quote}&rdquo;</p>
+              <div className="text-sm font-semibold">{t.client_name}</div>
+              {t.service && <div className="text-xs text-gray-500">{t.service}</div>}
+            </div>
+          ))}
+        </div>
+        
+        {/* Google Reviews CTA */}
+        <div className="mt-12 flex justify-center">
+          <GoogleReviews />
+        </div>
+      </div>
+    </Section>
   );
 }

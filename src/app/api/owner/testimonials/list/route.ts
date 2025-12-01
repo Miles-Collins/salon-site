@@ -1,0 +1,26 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import { isOwner } from "@/lib/authz";
+
+export async function GET() {
+  if (!(await isOwner())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data, error } = await supabase
+    .from("testimonials")
+    .select("*")
+    .order("display_order", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ testimonials: data || [] });
+}
