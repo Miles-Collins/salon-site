@@ -1,7 +1,3 @@
-'use client';
-
-import Link from "next/link";
-
 export default function NotFound() {
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
@@ -11,9 +7,9 @@ export default function NotFound() {
         <p className="text-gray-600 mb-8">
           Sorry, we couldn&apos;t find the page you&apos;re looking for.
         </p>
-        <Link href="/" className="btn">
+        <a href="/" className="btn">
           Return Home
-        </Link>
+        </a>
       </div>
     </div>
   );

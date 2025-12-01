@@ -22,13 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  const content = (
-    <>
-      <Navbar />
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </>
-  );
+  
   return (
     <html lang="en">
       <body className="min-h-screen antialiased flex flex-col">
@@ -37,10 +31,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             publishableKey={publishableKey}
             clerkJSUrl="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
           >
-            {content}
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
           </ClerkProvider>
         ) : (
-          content
+          <>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </>
         )}
       </body>
     </html>
