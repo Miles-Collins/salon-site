@@ -27,10 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen antialiased flex flex-col">
         {publishableKey ? (
-          <ClerkProvider
-            publishableKey={publishableKey}
-            clerkJSUrl="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
-          >
+          <ClerkProvider>
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />

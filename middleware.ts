@@ -6,6 +6,11 @@ const hasClerk = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 let handler: ((req: NextRequest) => Promise<Response> | Response) | null = null;
 
 export default async function middleware(req: NextRequest) {
+  // Skip middleware for not-found page during build
+  if (req.nextUrl.pathname === '/_not-found') {
+    return NextResponse.next();
+  }
+  
   if (!hasClerk) {
     return NextResponse.next();
   }

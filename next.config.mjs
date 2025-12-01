@@ -4,6 +4,16 @@ const nextConfig = {
   experimental: {
     serverMinification: false,
   },
+  webpack: (config, { isServer }) => {
+    // Help with Clerk during build
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      };
+    }
+    return config;
+  },
   images: {
     remotePatterns: [
       {
