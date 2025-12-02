@@ -117,7 +117,18 @@ export default function Navbar() {
           )}
         </div>
         {/* Mobile dropdown panel with smooth animation */}
-        {pathname?.startsWith("/owner") ? null : (
+        {pathname?.startsWith("/owner") ? (
+          // On owner routes, show a minimal mobile menu with Home link
+          <div
+            id="mobile-menu"
+            className={`md:hidden absolute left-0 right-0 top-16 bg-white text-black border-t border-black/10 shadow-xl overflow-hidden origin-top transform transition-all duration-1000 ease-out 
+              ${mobileOpen ? "opacity-100 scale-y-100 max-h-[40vh]" : "opacity-0 scale-y-0 max-h-0 pointer-events-none"}`}
+          >
+            <div className="py-3">
+              <Link href="/" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm">Home</Link>
+            </div>
+          </div>
+        ) : (
           <div
           id="mobile-menu"
           className={`md:hidden absolute left-0 right-0 top-16 bg-white text-black border-t border-black/10 shadow-xl overflow-hidden origin-top transform transition-all duration-1000 ease-out 
