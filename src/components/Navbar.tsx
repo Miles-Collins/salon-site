@@ -35,7 +35,7 @@ export default function Navbar() {
 
   return (
     <div
-      className={`w-full transition-all duration-300
+      className={`w-full transition-all duration-300 relative
         ${scrolled ? "bg-black/90 border-b border-black/30 shadow-lg backdrop-blur" : "bg-gradient-to-b from-black/60 to-transparent border-none"}`}
     >
       <div className="w-full flex h-16 items-center px-4 sm:px-5 md:px-6">
@@ -121,7 +121,7 @@ export default function Navbar() {
           // On owner routes, show a minimal mobile menu with Home link
           <div
             id="mobile-menu"
-            className={`md:hidden absolute left-0 right-0 top-16 bg-white text-black border-t border-black/10 shadow-xl overflow-hidden origin-top transform transition-all duration-1000 ease-out 
+            className={`md:hidden absolute left-0 right-0 top-full bg-white text-black border-t border-black/10 shadow-xl overflow-hidden origin-top transform transition-all duration-1000 ease-out 
               ${mobileOpen ? "opacity-100 scale-y-100 max-h-[40vh]" : "opacity-0 scale-y-0 max-h-0 pointer-events-none"}`}
           >
             <div className="py-3">
@@ -131,7 +131,7 @@ export default function Navbar() {
         ) : (
           <div
           id="mobile-menu"
-          className={`md:hidden absolute left-0 right-0 top-16 bg-white text-black border-t border-black/10 shadow-xl overflow-hidden origin-top transform transition-all duration-1000 ease-out 
+          className={`md:hidden absolute left-0 right-0 top-full bg-white text-black border-t border-black/10 shadow-xl overflow-hidden origin-top transform transition-all duration-1000 ease-out 
             ${mobileOpen ? "opacity-100 scale-y-100 max-h-[70vh]" : "opacity-0 scale-y-0 max-h-0 pointer-events-none"}`}
           >
             <div className="py-3">

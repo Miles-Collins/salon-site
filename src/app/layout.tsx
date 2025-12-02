@@ -37,10 +37,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             signUpFallbackRedirectUrl="/owner/dashboard"
           >
             <ToastProvider>
-              {/* Unified header container: navbar + announcement banner */}
+              {/* Unified header container: navbar + announcement banner (mobile: banner above nav) */}
               <header className="fixed top-0 left-0 w-full z-50">
-                <Navbar />
-                <AnnouncementBanner />
+                <div className="flex flex-col">
+                  <div className="order-2 md:order-1">
+                    <Navbar />
+                  </div>
+                  <div className="order-1 md:order-2">
+                    <AnnouncementBanner />
+                  </div>
+                </div>
               </header>
               <main className="flex-1">{children}</main>
               <Footer />
@@ -51,8 +57,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         ) : (
           <>
             <header className="fixed top-0 left-0 w-full z-50">
-              <Navbar />
-              <AnnouncementBanner />
+              <div className="flex flex-col">
+                <div className="order-2 md:order-1">
+                  <Navbar />
+                </div>
+                <div className="order-1 md:order-2">
+                  <AnnouncementBanner />
+                </div>
+              </div>
             </header>
             <main className="flex-1">{children}</main>
             <Footer />
