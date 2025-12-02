@@ -16,10 +16,6 @@ export default function OwnerDashboardPage() {
     <div className="mt-20 p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Owner Dashboard</h1>
-        {/* Top-right Staff Portal button for visibility when signed out */}
-        <SignInButton mode="modal" forceRedirectUrl="/owner/dashboard">
-          <button className="rounded bg-black text-white px-3 py-2 text-sm hover:opacity-90 dark:bg-white dark:text-black">Staff Portal</button>
-        </SignInButton>
       </div>
       <OwnerGate>
         <DashboardClient />
