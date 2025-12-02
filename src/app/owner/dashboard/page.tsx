@@ -129,6 +129,7 @@ export default function OwnerDashboardPage() {
                 </div>
                 <GalleryManager />
               </section>
+                </div>
               </div>
             </div>
           </div>
