@@ -5,6 +5,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Announcement marquee animation */
+@keyframes announcement-marquee {
+	0% { transform: translateX(0%); }
+	100% { transform: translateX(-50%); }
+}
+
+.announcement-marquee {
+	animation: announcement-marquee 20s linear infinite;
+}
+
 /* Script/cursive display font utility for hero accents */
 .font-script {
 	font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", "Dancing Script", cursive;

@@ -24,8 +24,15 @@ export default async function AnnouncementBanner() {
     const value = (data?.value || {}) as Announcement;
     if (!value?.enabled || !value?.text) return null;
     return (
-      <div className="w-full bg-yellow-100 text-yellow-900 text-sm py-2 px-4 text-center border-b border-yellow-200">
-        {value.text}
+      <div className="w-full border-b border-yellow-200 bg-yellow-100">
+        <div className="relative overflow-hidden">
+          <div className="announcement-marquee whitespace-nowrap will-change-transform text-yellow-900 text-sm py-2">
+            <span className="mx-8">{value.text}</span>
+            <span className="mx-8">{value.text}</span>
+            <span className="mx-8">{value.text}</span>
+            <span className="mx-8">{value.text}</span>
+          </div>
+        </div>
       </div>
     );
   } catch {
