@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/Toast";
 
 type Testimonial = {
   id: string;
@@ -18,6 +19,7 @@ export default function TestimonialsManager() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const toast = useToast();
   
   // Form state
   const [formData, setFormData] = useState({
@@ -35,8 +37,10 @@ export default function TestimonialsManager() {
       const res = await fetch("/api/owner/testimonials/list");
       const { testimonials: data } = await res.json();
       setTestimonials(data || []);
+      toast.info("Testimonials loaded");
     } catch (err) {
       console.error("Failed to load testimonials:", err);
+      toast.error("Failed to load testimonials");
     } finally {
       setLoading(false);
     }
@@ -64,9 +68,11 @@ export default function TestimonialsManager() {
         });
         setShowAddForm(false);
         await loadTestimonials();
+        toast.success("Testimonial added");
       }
     } catch (err) {
       console.error("Failed to add testimonial:", err);
+      toast.error("Failed to add testimonial");
     }
   };
 
@@ -80,9 +86,11 @@ export default function TestimonialsManager() {
       if (res.ok) {
         setEditingId(null);
         await loadTestimonials();
+        toast.success("Testimonial updated");
       }
     } catch (err) {
       console.error("Failed to update testimonial:", err);
+      toast.error("Failed to update testimonial");
     }
   };
 
@@ -94,9 +102,11 @@ export default function TestimonialsManager() {
       });
       if (res.ok) {
         await loadTestimonials();
+        toast.success("Testimonial deleted");
       }
     } catch (err) {
       console.error("Failed to delete testimonial:", err);
+      toast.error("Failed to delete testimonial");
     }
   };
 

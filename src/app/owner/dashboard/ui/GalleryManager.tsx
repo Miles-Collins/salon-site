@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useToast } from "@/components/Toast";
 
 type Item = { 
   name: string; 
@@ -15,6 +16,7 @@ export default function GalleryManager() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   const refresh = async () => {
     setLoading(true);
@@ -23,8 +25,10 @@ export default function GalleryManager() {
       const res = await fetch("/api/owner/gallery/list");
       const json = await res.json();
       setItems(json.items || []);
+      toast.info("Gallery loaded");
     } catch (e: any) {
       setError(e?.message || "Failed to load gallery");
+      toast.error("Failed to load gallery");
     } finally {
       setLoading(false);
     }
@@ -48,8 +52,10 @@ export default function GalleryManager() {
       });
       if (!res.ok) throw new Error("Upload failed");
       await refresh();
+      toast.success("Image uploaded");
     } catch (e: any) {
       setError(e?.message || "Upload failed");
+      toast.error("Upload failed");
     } finally {
       setLoading(false);
       e.target.value = "";
@@ -68,8 +74,10 @@ export default function GalleryManager() {
       });
       if (!res.ok) throw new Error("Delete failed");
       await refresh();
+      toast.success("Image deleted");
     } catch (e: any) {
       setError(e?.message || "Delete failed");
+      toast.error("Delete failed");
     } finally {
       setLoading(false);
     }
@@ -93,8 +101,10 @@ export default function GalleryManager() {
       });
       if (!res.ok) throw new Error("Save failed");
       await refresh();
+      toast.success("Saved");
     } catch (e: any) {
       setError(e?.message || "Save failed");
+      toast.error("Save failed");
     } finally {
       setLoading(false);
     }

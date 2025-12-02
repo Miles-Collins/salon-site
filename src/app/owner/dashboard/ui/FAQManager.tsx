@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/Toast";
 
 type FAQ = {
   id: string;
@@ -18,6 +19,7 @@ export default function FAQManager() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const toast = useToast();
   
   const [formData, setFormData] = useState({
     question: "",
@@ -33,8 +35,10 @@ export default function FAQManager() {
       const res = await fetch("/api/owner/faqs/list");
       const { faqs: data } = await res.json();
       setFaqs(data || []);
+      toast.info("FAQs loaded");
     } catch (err) {
       console.error("Failed to load FAQs:", err);
+      toast.error("Failed to load FAQs");
     } finally {
       setLoading(false);
     }
@@ -61,9 +65,11 @@ export default function FAQManager() {
         });
         setShowAddForm(false);
         await loadFAQs();
+        toast.success("FAQ added");
       }
     } catch (err) {
       console.error("Failed to add FAQ:", err);
+      toast.error("Failed to add FAQ");
     }
   };
 
@@ -77,9 +83,11 @@ export default function FAQManager() {
       if (res.ok) {
         setEditingId(null);
         await loadFAQs();
+        toast.success("FAQ updated");
       }
     } catch (err) {
       console.error("Failed to update FAQ:", err);
+      toast.error("Failed to update FAQ");
     }
   };
 
@@ -91,9 +99,11 @@ export default function FAQManager() {
       });
       if (res.ok) {
         await loadFAQs();
+        toast.success("FAQ deleted");
       }
     } catch (err) {
       console.error("Failed to delete FAQ:", err);
+      toast.error("Failed to delete FAQ");
     }
   };
 

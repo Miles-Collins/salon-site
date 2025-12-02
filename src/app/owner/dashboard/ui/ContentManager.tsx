@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useToast } from "@/components/Toast";
 
 type Content = {
   hero?: { title?: string; subtitle?: string };
@@ -11,6 +12,7 @@ export default function ContentManager() {
   const [content, setContent] = useState<Content>({});
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const toast = useToast();
 
   const load = async () => {
     setLoading(true);
@@ -19,8 +21,10 @@ export default function ContentManager() {
       const res = await fetch("/api/owner/content/get");
       const json = await res.json();
       setContent(json.content || {});
+      toast.info("Content loaded");
     } catch (e: any) {
       setMsg(e?.message || "Failed to load content");
+      toast.error("Failed to load content");
     } finally {
       setLoading(false);
     }
@@ -39,8 +43,10 @@ export default function ContentManager() {
       });
       if (!res.ok) throw new Error("Save failed");
       setMsg("Saved");
+      toast.success("Saved");
     } catch (e: any) {
       setMsg(e?.message || "Save failed");
+      toast.error(e?.message || "Save failed");
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import StickyBookCTA from "@/components/StickyBookCTA";
 import ChatWidget from "@/components/ChatWidget";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
   title: "Color Rebel by Porscha",
@@ -34,11 +35,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             signInFallbackRedirectUrl="/owner/dashboard"
             signUpFallbackRedirectUrl="/owner/dashboard"
           >
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <StickyBookCTA />
-            <ChatWidget />
+            <ToastProvider>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <StickyBookCTA />
+              <ChatWidget />
+            </ToastProvider>
           </ClerkProvider>
         ) : (
           <>

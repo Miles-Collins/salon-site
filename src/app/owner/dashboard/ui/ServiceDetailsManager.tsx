@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/Toast";
 
 type ProcessStep = {
   step: number;
@@ -52,6 +53,7 @@ export default function ServiceDetailsManager() {
     faqs: [],
     is_published: true,
   });
+  const toast = useToast();
 
   useEffect(() => {
     fetchServices();
@@ -62,6 +64,7 @@ export default function ServiceDetailsManager() {
     if (res.ok) {
       const data = await res.json();
       setServices(data);
+      toast.info("Services loaded");
     }
   }
 
@@ -99,6 +102,7 @@ export default function ServiceDetailsManager() {
       if (res.ok) {
         await fetchServices();
         handleCancel();
+        toast.success("Service updated");
       }
     } else {
       // Create new
@@ -110,6 +114,7 @@ export default function ServiceDetailsManager() {
       if (res.ok) {
         await fetchServices();
         handleCancel();
+        toast.success("Service created");
       }
     }
   }
@@ -121,6 +126,7 @@ export default function ServiceDetailsManager() {
     });
     if (res.ok) {
       await fetchServices();
+      toast.success("Service deleted");
     }
   }
 
