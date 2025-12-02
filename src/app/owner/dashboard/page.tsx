@@ -7,26 +7,33 @@ import FAQManager from './ui/FAQManager';
 import ServiceDetailsManager from './ui/ServiceDetailsManager';
 import ChatSettingsManager from './ui/ChatSettingsManager';
 import OwnerGate from './ui/OwnerGate';
-import { SignInButton } from '@clerk/nextjs';
+import DashboardSidebar from './ui/DashboardSidebar';
 
 export const dynamic = 'force-dynamic';
 
 export default function OwnerDashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="mt-16 p-4 md:p-8 max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Manage your salon&apos;s online presence</p>
-        </div>
-        <OwnerGate>
-          {/* Metrics & Analytics Section */}
-          <DashboardClient />
+      <OwnerGate>
+        <div className="flex min-h-screen">
+          {/* Sidebar */}
+          <DashboardSidebar />
           
-          {/* Content Management Grid */}
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Content Management</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Main Content */}
+          <div className="flex-1 mt-16 p-4 md:p-8 lg:ml-64">
+            <div className="max-w-7xl mx-auto">
+              <div className="mb-8">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Dashboard</h1>
+                <p className="text-gray-600 mt-1">Manage your salon&apos;s online presence</p>
+              </div>
+              
+              {/* Metrics & Analytics Section */}
+              <DashboardClient />
+              
+              {/* Content Management Grid */}
+              <div className="mt-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Content Management</h2>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Site Content Card */}
               <section className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
@@ -122,10 +129,11 @@ export default function OwnerDashboardPage() {
                 </div>
                 <GalleryManager />
               </section>
+              </div>
             </div>
           </div>
-        </OwnerGate>
-      </div>
+        </div>
+      </OwnerGate>
     </div>
   );
 }
