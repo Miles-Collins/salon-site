@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/components/Toast";
 
 type ProcessStep = {
@@ -37,6 +37,7 @@ type ServiceDetail = {
 };
 
 export default function ServiceDetailsManager() {
+  const formRef = useRef<HTMLDivElement>(null);
   const [services, setServices] = useState<ServiceDetail[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<ServiceDetail>>({
@@ -71,6 +72,10 @@ export default function ServiceDetailsManager() {
   function handleEdit(service: ServiceDetail) {
     setEditingId(service.id);
     setFormData(service);
+    // Scroll to form
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   }
 
   function handleCancel() {
@@ -197,7 +202,7 @@ export default function ServiceDetailsManager() {
       <h2 className="text-2xl font-bold mb-4">Service Detail Pages</h2>
 
       {/* Form */}
-      <div className="mb-6 p-4 border rounded">
+      <div ref={formRef} className="mb-6 p-4 border rounded scroll-mt-20">
         <h3 className="font-semibold mb-3">
           {editingId ? "Edit Service Detail" : "Create New Service Detail"}
         </h3>
