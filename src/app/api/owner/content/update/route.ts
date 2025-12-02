@@ -8,10 +8,12 @@ export async function POST(request: Request) {
   if (!(await isOwner())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey) {
+    return NextResponse.json({ error: "Supabase service role key not configured" }, { status: 500 });
+  }
+  const supabase = createClient(supabaseUrl, serviceKey);
   const body = await request.json().catch(() => null) as { key?: string; value?: any } | null;
   if (!body?.key) {
     return NextResponse.json({ error: "Missing key" }, { status: 400 });
