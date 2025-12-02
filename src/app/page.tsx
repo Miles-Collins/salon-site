@@ -4,7 +4,6 @@ import Image from "next/image";
 import heroImg from "../../public/hero.jpg";
 import logoImg from "../../public/ColorRebelTransparent.png";
 import { createClient } from "@supabase/supabase-js";
-import AnnouncementBanner from "@/components/AnnouncementBanner";
 import GoogleReviews from "@/components/GoogleReviews";
 import FAQAccordion from "@/components/FAQAccordion";
 
@@ -48,8 +47,6 @@ export default async function HomePage() {
   const announcement = content.announcement;
   return (
     <>
-      {/* Announcement under navbar on homepage */}
-      <AnnouncementBanner />
       {/* Schema.org LocalBusiness */}
       <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{
         __html: JSON.stringify({
