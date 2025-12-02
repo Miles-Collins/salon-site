@@ -4,10 +4,10 @@ import { headers } from "next/headers";
 type Announcement = { enabled?: boolean; text?: string };
 
 export default async function AnnouncementBanner() {
-  const hdrs = headers();
-  const path = hdrs.get("x-invoke-path") || hdrs.get("next-url") || "";
+  const hdrs = await headers();
+  const pathname = hdrs.get("x-pathname") || hdrs.get("x-invoke-path") || hdrs.get("next-url") || "";
   // Hide on owner/admin routes
-  if (path?.startsWith("/owner")) return null;
+  if (pathname?.startsWith("/owner")) return null;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

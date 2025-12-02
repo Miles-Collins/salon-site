@@ -37,9 +37,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             signUpFallbackRedirectUrl="/owner/dashboard"
           >
             <ToastProvider>
-              <Navbar />
-              {/* Attach banner directly below navbar if enabled */}
-              <AnnouncementBanner />
+              {/* Unified header container: navbar + announcement banner */}
+              <header className="fixed top-0 left-0 w-full z-50">
+                <Navbar />
+                <AnnouncementBanner />
+              </header>
               <main className="flex-1">{children}</main>
               <Footer />
               <StickyBookCTA />
@@ -48,7 +50,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ClerkProvider>
         ) : (
           <>
-            <Navbar />
+            <header className="fixed top-0 left-0 w-full z-50">
+              <Navbar />
+              <AnnouncementBanner />
+            </header>
             <main className="flex-1">{children}</main>
             <Footer />
             <StickyBookCTA />
