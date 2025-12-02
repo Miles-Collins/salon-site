@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import StickyBookCTA from "@/components/StickyBookCTA";
 import ChatWidget from "@/components/ChatWidget";
 import { ClerkProvider } from "@clerk/nextjs";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
@@ -37,6 +38,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           >
             <ToastProvider>
               <Navbar />
+              {/* Announcement banner shows on public routes when enabled */}
+              {/* @ts-expect-error Async Server Component */}
+              <AnnouncementBanner />
               <main className="flex-1">{children}</main>
               <Footer />
               <StickyBookCTA />
