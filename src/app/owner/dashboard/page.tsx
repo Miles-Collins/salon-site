@@ -20,7 +20,7 @@ export default function OwnerDashboardPage() {
           <DashboardSidebar />
           
           {/* Main Content */}
-          <div className="flex-1 mt-16 p-4 md:p-8 lg:ml-64">
+          <div className="flex-1 mt-16 p-3 sm:p-4 md:p-6 lg:p-8 lg:ml-64">
             <div className="max-w-7xl mx-auto">
               <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Dashboard</h1>
@@ -32,8 +32,8 @@ export default function OwnerDashboardPage() {
               
               {/* Content Management Grid */}
               <div className="mt-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Content Management</h2>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Content Management</h2>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
               {/* Site Content Card */}
               <section className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center gap-3 mb-4">

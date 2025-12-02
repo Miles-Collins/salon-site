@@ -56,9 +56,9 @@ export default function DashboardClient() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Upload Section */}
-      <section className="bg-white rounded-lg shadow-md p-6">
+      <section className="bg-white rounded-lg shadow-md p-4 md:p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@ export default function DashboardClient() {
       {metrics && (
         <>
           {/* KPI Cards Grid */}
-          <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <section className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4">
             <KpiCard title="This Month's Revenue" value={formatCurrency(metrics.kpis.thisMonthRevenue)} icon="💰" color="from-emerald-500 to-emerald-600" />
             <KpiCard title="This Week's Appointments" value={metrics.kpis.thisWeekAppointments.toString()} icon="📅" color="from-blue-500 to-blue-600" />
             <KpiCard title="Average Ticket" value={formatCurrency(metrics.kpis.averageTicket)} icon="💵" color="from-purple-500 to-purple-600" />
@@ -103,11 +103,11 @@ export default function DashboardClient() {
             <KpiCard title="Top Client Month Spend" value={formatCurrency(metrics.kpis.topClientSpendMonth)} icon="⭐" color="from-yellow-500 to-yellow-600" />
           </section>
           {/* Charts & Data Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4 md:gap-6">
             {/* Revenue Chart */}
             <section className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue (Last 6 Months)</h2>
-              <div className="w-full h-64">
+              <div className="w-full h-48 sm:h-56 md:h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={metrics.monthRevenue}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -145,25 +145,25 @@ export default function DashboardClient() {
           </div>
 
           {/* Appointments Table */}
-          <section className="bg-white rounded-lg shadow-md p-6">
+          <section className="bg-white rounded-lg shadow-md p-4 md:p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Appointments</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left border-b-2 border-gray-200">
-                    <th className="py-3 font-semibold text-gray-700">Date</th>
-                    <th className="py-3 font-semibold text-gray-700">Service</th>
-                    <th className="py-3 font-semibold text-gray-700">Client</th>
-                    <th className="py-3 font-semibold text-gray-700 text-right">Price</th>
+                    <th className="py-2 md:py-3 font-semibold text-gray-700 text-xs md:text-sm">Date</th>
+                    <th className="py-2 md:py-3 font-semibold text-gray-700 text-xs md:text-sm">Service</th>
+                    <th className="py-2 md:py-3 font-semibold text-gray-700 text-xs md:text-sm">Client</th>
+                    <th className="py-2 md:py-3 font-semibold text-gray-700 text-right text-xs md:text-sm">Price</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {metrics.recentAppointments.map((a, idx) => (
                     <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                      <td className="py-3 text-gray-900">{new Date(a.start_time).toLocaleString()}</td>
-                      <td className="py-3 text-gray-900">{a.service_name}</td>
-                      <td className="py-3 text-gray-900">{a.client_name}</td>
-                      <td className="py-3 text-right font-medium text-gray-900">{a.price != null ? formatCurrency(a.price) : '—'}</td>
+                      <td className="py-2 md:py-3 text-gray-900 text-xs md:text-sm">{new Date(a.start_time).toLocaleString()}</td>
+                      <td className="py-2 md:py-3 text-gray-900 text-xs md:text-sm">{a.service_name}</td>
+                      <td className="py-2 md:py-3 text-gray-900 text-xs md:text-sm">{a.client_name}</td>
+                      <td className="py-2 md:py-3 text-right font-medium text-gray-900 text-xs md:text-sm">{a.price != null ? formatCurrency(a.price) : '—'}</td>
                     </tr>
                   ))}
                 </tbody>
