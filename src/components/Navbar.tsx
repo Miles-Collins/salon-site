@@ -135,6 +135,14 @@ export default function Navbar() {
                 </Link>
               ))}
               <Link href="/book" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm">Book Now</Link>
+              {/* Staff Portal / Dashboard link in mobile menu */}
+              {isSignedIn ? (
+                <Link href="/owner/dashboard" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm border-t border-black/10">Dashboard</Link>
+              ) : (
+                <SignInButton mode="modal" forceRedirectUrl="/owner/dashboard">
+                  <button className="block w-full text-left px-5 py-3 uppercase tracking-[0.35em] text-sm border-t border-black/10">Staff Portal</button>
+                </SignInButton>
+              )}
             </div>
           </div>
         )}
