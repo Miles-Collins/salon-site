@@ -29,7 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen antialiased flex flex-col">
         {publishableKey ? (
-          <ClerkProvider publishableKey={publishableKey as string}>
+          <ClerkProvider 
+            publishableKey={publishableKey as string}
+            signInFallbackRedirectUrl="/owner/dashboard"
+            signUpFallbackRedirectUrl="/owner/dashboard"
+          >
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />

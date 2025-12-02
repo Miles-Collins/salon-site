@@ -75,8 +75,8 @@ export default function Navbar() {
                 <UserButton afterSignOutUrl="/" />
               ) : (
                 <>
-                  <SignInButton mode="modal">
-                    <button className="rounded bg-white text-black px-3 py-2 text-sm hover:opacity-85">Log In</button>
+                  <SignInButton mode="modal" forceRedirectUrl="/owner/dashboard">
+                    <button className="rounded bg-white text-black px-3 py-2 text-sm hover:opacity-85">Staff Portal</button>
                   </SignInButton>
                   {/* Fallback link if Clerk modal fails to render */}
                   <Link href="/sign-in" className="text-xs underline text-white">Use sign-in page</Link>
@@ -105,6 +105,14 @@ export default function Navbar() {
               >
                 Book
               </Link>
+              {/* Subtle Staff Portal link on all public pages */}
+              {isSignedIn ? (
+                <Link href="/owner/dashboard" className="text-white/80 text-sm hover:text-white hidden sm:inline">Dashboard →</Link>
+              ) : (
+                <SignInButton mode="modal" forceRedirectUrl="/owner/dashboard">
+                  <button className="text-white/80 text-sm hover:text-white hidden sm:inline">Staff Portal</button>
+                </SignInButton>
+              )}
             </>
           )}
         </div>
