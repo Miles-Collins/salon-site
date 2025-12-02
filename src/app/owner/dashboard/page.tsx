@@ -5,14 +5,22 @@ import ContentManager from './ui/ContentManager';
 import TestimonialsManager from './ui/TestimonialsManager';
 import FAQManager from './ui/FAQManager';
 import ServiceDetailsManager from './ui/ServiceDetailsManager';
+import ChatSettingsManager from './ui/ChatSettingsManager';
 import OwnerGate from './ui/OwnerGate';
+import { SignInButton } from '@clerk/nextjs';
 
 export const dynamic = 'force-dynamic';
 
 export default function OwnerDashboardPage() {
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Owner Dashboard</h1>
+    <div className="mt-20 p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Owner Dashboard</h1>
+        {/* Top-right login button for visibility when signed out */}
+        <SignInButton mode="modal">
+          <button className="rounded bg-black text-white px-3 py-2 text-sm hover:opacity-90 dark:bg-white dark:text-black">Log In</button>
+        </SignInButton>
+      </div>
       <OwnerGate>
         <DashboardClient />
         <section>
@@ -34,6 +42,11 @@ export default function OwnerDashboardPage() {
           <h2 className="text-xl font-semibold">Service Detail Pages</h2>
           <p className="text-sm text-gray-600 mb-3">Create detailed pages for individual services with pricing tiers, process steps, and FAQs.</p>
           <ServiceDetailsManager />
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold">Chat Widget</h2>
+          <p className="text-sm text-gray-600 mb-3">Customize the live chat widget on your website.</p>
+          <ChatSettingsManager />
         </section>
         <section>
           <h2 className="text-xl font-semibold">Gallery Manager</h2>

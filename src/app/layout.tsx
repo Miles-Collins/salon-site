@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import StickyBookCTA from "@/components/StickyBookCTA";
+import ChatWidget from "@/components/ChatWidget";
 import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
@@ -27,16 +29,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen antialiased flex flex-col">
         {publishableKey ? (
-          <ClerkProvider>
+          <ClerkProvider publishableKey={publishableKey as string}>
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />
+            <StickyBookCTA />
+            <ChatWidget />
           </ClerkProvider>
         ) : (
           <>
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />
+            <StickyBookCTA />
+            <ChatWidget />
           </>
         )}
       </body>

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 
 const nav = [
   { href: "/about", label: "About" },
@@ -14,6 +15,8 @@ import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const search = useSearchParams();
+  const { isSignedIn } = useUser();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -36,11 +39,17 @@ export default function Navbar() {
         ${scrolled ? "bg-black/90 border-b border-black/30 shadow-lg backdrop-blur" : "bg-gradient-to-b from-black/60 to-transparent border-none"}`}
     >
       <div className="w-full flex h-16 items-center px-4 sm:px-5 md:px-6">
+        {/* Global error banner (e.g., unauthorized access) */}
+        {search?.get("error") === "unauthorized" && (
+          <div className="absolute left-0 right-0 top-full mt-0 bg-red-600 text-white text-sm px-4 py-2 shadow">
+            Access denied: please sign in with an authorized Google account.
+          </div>
+        )}
         {/* Mobile menu toggle */}
         <button
           type="button"
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen ? "true" : "false"}
+          aria-expanded={mobileOpen ? true : false}
           aria-controls="mobile-menu"
           className="md:hidden mr-3 text-white/90 hover:text-brand-accent focus:outline-none"
           onClick={() => setMobileOpen((v) => !v)}
@@ -60,47 +69,67 @@ export default function Navbar() {
           </span>
         </Link>
         <div className="ml-auto flex items-center gap-6">
-          <nav className="hidden gap-4 md:flex">
-            {nav.map((item) => {
-              const active = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`group px-0 py-2 text-sm font-medium uppercase tracking-wide text-white link-underline ${active ? "after:scale-x-100" : ""}`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-          <Link
-            href="/book"
-            className="group text-white text-sm font-semibold uppercase tracking-wide link-underline"
-          >
-            Book
-          </Link>
+          {pathname?.startsWith("/owner") ? (
+            <div className="flex items-center gap-4">
+              {isSignedIn ? (
+                <UserButton afterSignOutUrl="/" />
+              ) : (
+                <>
+                  <SignInButton mode="modal">
+                    <button className="rounded bg-white text-black px-3 py-2 text-sm hover:opacity-85">Log In</button>
+                  </SignInButton>
+                  {/* Fallback link if Clerk modal fails to render */}
+                  <Link href="/sign-in" className="text-xs underline text-white">Use sign-in page</Link>
+                </>
+              )}
+            </div>
+          ) : (
+            <>
+              <nav className="hidden gap-4 md:flex">
+                {nav.map((item) => {
+                  const active = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`group px-0 py-2 text-sm font-medium uppercase tracking-wide text-white link-underline ${active ? "after:scale-x-100" : ""}`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+              <Link
+                href="/book"
+                className="group text-white text-sm font-semibold uppercase tracking-wide link-underline"
+              >
+                Book
+              </Link>
+            </>
+          )}
         </div>
         {/* Mobile dropdown panel with smooth animation */}
-        <div
+        {pathname?.startsWith("/owner") ? null : (
+          <div
           id="mobile-menu"
           className={`md:hidden absolute left-0 right-0 top-16 bg-white text-black border-t border-black/10 shadow-xl overflow-hidden origin-top transform transition-all duration-1000 ease-out 
             ${mobileOpen ? "opacity-100 scale-y-100 max-h-[70vh]" : "opacity-0 scale-y-0 max-h-0 pointer-events-none"}`}
-        >
-          <div className="py-3">
-            <Link href="/" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm border-b border-black/10">Home</Link>
-            {nav.map((item, idx) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`block px-5 py-3 uppercase tracking-[0.35em] text-sm ${idx < nav.length - 1 ? "border-b border-black/10" : ""}`}
-              >
-                {item.label}
-              </Link>
-            ))}
-            <Link href="/book" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm">Book Now</Link>
+          >
+            <div className="py-3">
+              <Link href="/" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm border-b border-black/10">Home</Link>
+              {nav.map((item, idx) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`block px-5 py-3 uppercase tracking-[0.35em] text-sm ${idx < nav.length - 1 ? "border-b border-black/10" : ""}`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <Link href="/book" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm">Book Now</Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );

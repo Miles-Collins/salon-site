@@ -1,0 +1,17 @@
+{
+  "headers": [
+    {
+      "source": "/npm/@clerk/clerk-js@(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/npm/@clerk/(.*)",
+      "destination": "https://frontend-api.clerk.services/npm/@clerk/$1",
+      "permanent": false
+    }
+  ]
+}
