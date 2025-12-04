@@ -8,7 +8,10 @@ export default {
         brand: { DEFAULT: "#1F2937", accent: "#E879F9" }, // charcoal + lilac-pink
       },
       boxShadow: { soft: "0 12px 32px rgba(0,0,0,.08)" },
-      fontFamily: { sans: ["ui-sans-serif", "system-ui", "Segoe UI", "Inter", "sans-serif"] }
+      fontFamily: { 
+        sans: ["ui-sans-serif", "system-ui", "Segoe UI", "Inter", "sans-serif"],
+        serif: ["Playfair Display", "Georgia", "serif"]
+      }
     },
   },
   plugins: [],

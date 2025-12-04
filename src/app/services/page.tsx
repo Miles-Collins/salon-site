@@ -13,7 +13,7 @@ export default function ServicesPage() {
   return (
     <Section>
       {/* Mini Hero Section */}
-  <div id="services-hero" className="relative w-full h-[360px] md:h-[460px] mb-12 flex items-center overflow-hidden">
+      <div id="services-hero" className="relative w-full h-[360px] md:h-[460px] mb-12 flex items-center overflow-hidden">
         <Image
           src={servicesHero}
           alt="Hair coloring in salon"
@@ -28,7 +28,7 @@ export default function ServicesPage() {
         <div className="relative z-20 w-full">
           <div className="pl-6 sm:pl-10 md:pl-16 py-8 text-left">
             <span className={`${dancing.className} block text-white/95 text-5xl md:text-6xl lg:text-7xl mb-3 tracking-wide`}>Premium</span>
-            <h1 className="text-white text-5xl md:text-7xl font-extrabold tracking-tight">SERVICES</h1>
+            <h1 className="text-white text-5xl md:text-7xl font-serif font-extrabold tracking-tight">SERVICES</h1>
           </div>
         </div>
       </div>

@@ -1,6 +1,9 @@
 .text-cheetah:hover {
 		cursor: url('/leopard-cursor.png') 16 16, pointer;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -40,8 +43,8 @@ html, body { background: var(--bg); color: var(--fg); }
   border-bottom: 2px solid #d4af37;
 }
 .section { @apply px-4 sm:px-6 py-14 lg:py-20; }
-.h1 { @apply text-4xl lg:text-5xl font-bold tracking-tight; }
-.h2 { @apply text-3xl font-semibold tracking-tight; }
+.h1 { @apply text-4xl lg:text-5xl font-bold tracking-tight font-serif; }
+.h2 { @apply text-3xl font-semibold tracking-tight font-serif; }
 .muted { @apply text-black/70; }
 
 /* Subtle underline on hover like reference site */
