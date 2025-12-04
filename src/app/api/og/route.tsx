@@ -69,7 +69,7 @@ export async function GET(request: Request) {
               fontSize: 80,
               fontWeight: 600,
               letterSpacing: '0.15em',
-              color: '#d4af37',
+              color: '#C9A961',
               textTransform: 'uppercase',
             }}
           >
@@ -91,9 +91,9 @@ export async function GET(request: Request) {
           }}
         >
           <span>Leavenworth, KS</span>
-          <span style={{ color: '#d4af37' }}>•</span>
+          <span style={{ color: '#C9A961' }}>•</span>
           <span>(913) 680-7987</span>
-          <span style={{ color: '#d4af37' }}>•</span>
+          <span style={{ color: '#C9A961' }}>•</span>
           <span>colorrebelbyporscha.com</span>
         </div>
       </div>

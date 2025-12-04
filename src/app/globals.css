@@ -200,6 +200,28 @@ select:focus {
 	pointer-events: none;
 }
 
+/* Premium color palette with jewel tones */
+.gradient-luxe-emerald {
+	background: linear-gradient(135deg, rgba(45, 125, 94, 0.15) 0%, rgba(201, 169, 97, 0.1) 100%);
+}
+
+.gradient-luxe-sapphire {
+	background: linear-gradient(135deg, rgba(30, 58, 138, 0.15) 0%, rgba(201, 169, 97, 0.1) 100%);
+}
+
+.gradient-luxe-burgundy {
+	background: linear-gradient(135deg, rgba(107, 27, 71, 0.15) 0%, rgba(201, 169, 97, 0.1) 100%);
+}
+
+.gradient-luxe-amethyst {
+	background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(201, 169, 97, 0.1) 100%);
+}
+
+/* Jewel tone overlay for testimonials section */
+.testimonials-overlay {
+	background: radial-gradient(circle at bottom right, rgba(45, 125, 94, 0.03), transparent 70%);
+}
+
 /* Script/cursive display font utility for hero accents */
 .font-script {
 	font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", "Dancing Script", cursive;

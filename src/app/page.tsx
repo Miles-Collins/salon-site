@@ -106,7 +106,7 @@ export default async function HomePage() {
           sizes="(min-width: 1280px) 1280px, 100vw"
           quality={70}
         />
-        <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-black/70 via-black/40 to-black/30" />
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-black/70 via-black/40 to-purple/20" />
         <div className="absolute inset-0 w-full h-full grain-overlay" />
         {/* Mobile: centered logo overlay */}
         <div className="relative z-10 flex md:hidden items-center justify-center h-full">
@@ -305,8 +305,10 @@ async function TestimonialsSection() {
   const others = testimonials.slice(1);
 
   return (
-    <Section className="py-24 md:py-32 bg-gradient-to-b from-white via-gray-50 to-white">
-      <div className="max-w-6xl mx-auto">
+    <Section className="py-24 md:py-32 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden">
+      {/* Subtle jewel tone accent overlay */}
+      <div className="absolute inset-0 pointer-events-none testimonials-overlay" />
+      <div className="relative z-10 max-w-6xl mx-auto">
         <div className="text-center mb-20">
           <h2 className="h2 font-serif mb-6">What Our Clients Say</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">Real transformations, real happiness</p>
