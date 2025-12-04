@@ -2,8 +2,21 @@ import Section from "@/components/Section";
 import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
+import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Hair Transformations",
+  description: "View stunning before & after hair transformations. Color corrections, vivid colors, precision cuts, and complete makeovers by Porscha. Real client results.",
+  openGraph: {
+    title: "Hair Transformations | Color Rebel by Porscha",
+    description: "Stunning before & after hair transformations. See real client results and dramatic changes.",
+    url: "https://colorrebelbyporscha.com/transformations",
+    images: [{ url: "/api/og?page=transformations", width: 1200, height: 630, alt: "Hair Transformations" }],
+  },
+};
 
 type GalleryImage = {
   name: string;
@@ -59,9 +72,24 @@ export default async function TransformationsPage() {
         <div className="max-w-6xl mx-auto">
           {transformations.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-500 text-lg">
+              <p className="text-gray-500 text-lg mb-8">
                 Transformation gallery coming soon! Check back for amazing before & after reveals.
               </p>
+              <p className="text-gray-600 mb-6">
+                In the meantime, explore our interactive before/after demo below:
+              </p>
+              {/* Demo slider with placeholder images */}
+              <div className="max-w-2xl mx-auto mb-8">
+                <BeforeAfterSlider
+                  beforeImage="/gallery/2025-10-09.webp"
+                  afterImage="/gallery/2025-10-12.webp"
+                  beforeAlt="Before hair transformation"
+                  afterAlt="After hair transformation"
+                />
+                <p className="text-sm text-gray-500 mt-4 italic">
+                  Interactive demo - drag the slider to compare
+                </p>
+              </div>
               <Link href="/gallery" className="btn-outline mt-6 inline-block">
                 View Full Gallery
               </Link>
@@ -75,47 +103,40 @@ export default async function TransformationsPage() {
                 const afterUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery/${transformation.name}`;
 
                 return (
-                  <div key={transformation.name} className="space-y-4">
+                  <div key={transformation.name} className="space-y-6">
                     {transformation.caption && (
                       <h3 className="text-2xl font-semibold text-center text-gray-900">
                         {transformation.caption}
                       </h3>
                     )}
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {/* Before */}
-                      {beforeUrl && (
-                        <div className="relative">
-                          <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/70 text-white text-sm font-semibold rounded">
-                            BEFORE
-                          </div>
-                          <div className="relative aspect-[3/4] rounded overflow-hidden shadow-lg">
-                            <Image
-                              src={beforeUrl}
-                              alt={`Before transformation ${idx + 1}`}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 768px) 100vw, 50vw"
-                            />
-                          </div>
-                        </div>
-                      )}
+                    
+                    {/* Interactive Before/After Slider */}
+                    {beforeUrl && (
+                      <div className="max-w-4xl mx-auto">
+                        <BeforeAfterSlider
+                          beforeImage={beforeUrl}
+                          afterImage={afterUrl}
+                          beforeAlt={`Before: ${transformation.caption || 'Hair transformation'}`}
+                          afterAlt={`After: ${transformation.caption || 'Hair transformation'}`}
+                        />
+                      </div>
+                    )}
 
-                      {/* After */}
-                      <div className="relative">
-                        <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-brand-accent text-white text-sm font-semibold rounded">
-                          AFTER
-                        </div>
-                        <div className="relative aspect-[3/4] rounded overflow-hidden shadow-lg">
+                    {/* Fallback: Side by side if no before image */}
+                    {!beforeUrl && (
+                      <div className="relative max-w-2xl mx-auto">
+                        <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-lg">
                           <Image
                             src={afterUrl}
-                            alt={`After transformation ${idx + 1}`}
+                            alt={`Transformation: ${transformation.caption || idx + 1}`}
                             fill
                             className="object-cover"
                             sizes="(max-width: 768px) 100vw, 50vw"
                           />
                         </div>
                       </div>
-                    </div>
+                    )}
+
                     {transformation.tags && transformation.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 justify-center">
                         {transformation.tags.map((tag) => (

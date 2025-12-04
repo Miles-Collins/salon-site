@@ -6,6 +6,7 @@ import logoImg from "../../public/ColorRebelTransparent.png";
 import { createClient } from "@supabase/supabase-js";
 import GoogleReviews from "@/components/GoogleReviews";
 import FAQAccordion from "@/components/FAQAccordion";
+import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -277,6 +278,37 @@ export default async function HomePage() {
           </div>
           <div className="text-center">
             <Link href="/services" className="btn-outline">View All Services</Link>
+          </div>
+        </div>
+      </Section>
+
+      {/* Before/After Transformation Showcase */}
+      <Section className="py-24 md:py-32">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="h2 mb-4">See the Transformation</h2>
+            <p className="text-lg text-gray-600">Real results from real clients. Drag the slider to see the before and after.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <BeforeAfterSlider
+              beforeImage="/gallery/2025-10-09.webp"
+              afterImage="/gallery/2025-10-12.webp"
+              beforeAlt="Before hair color transformation"
+              afterAlt="After vivid hair color"
+            />
+            <BeforeAfterSlider
+              beforeImage="/gallery/2025-10-13.webp"
+              afterImage="/gallery/2025-10-133.webp"
+              beforeAlt="Before hair styling"
+              afterAlt="After precision cut and style"
+            />
+          </div>
+          
+          <div className="text-center">
+            <Link href="/transformations" className="btn-primary">
+              View All Transformations
+            </Link>
           </div>
         </div>
       </Section>
