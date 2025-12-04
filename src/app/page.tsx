@@ -149,31 +149,33 @@ export default async function HomePage() {
       )}
 
       {/* About/Intro Section */}
-      <Section className="py-12">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="h2 mb-4">Welcome</h2>
-          <p className="muted text-lg">
+      <Section className="py-24 md:py-32">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="h2 mb-6">Welcome</h2>
+          <p className="text-lg text-gray-700 leading-relaxed">
             Experience a relaxing, one-on-one salon visit. Transparent pricing, easy online booking, and expert care for every hair type.
           </p>
         </div>
       </Section>
 
       {/* Services Preview */}
-      <Section className="py-12">
-        <div className="grid gap-8 md:grid-cols-3">
-          {[
-            { t: "Cuts & Styling", d: "Precision cuts, blowouts, and event styling." },
-            { t: "Color & Highlights", d: "Balayage, highlights, and vibrant color." },
-            { t: "Treatments", d: "Deep conditioning, repair, and smoothing." },
-          ].map((x) => (
-            <div key={x.t} className="card p-8 text-center">
-              <h3 className="text-xl font-semibold mb-2">{x.t}</h3>
-              <p className="muted text-base">{x.d}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Link href="/services" className="btn-outline">View All Services</Link>
+      <Section className="py-24 md:py-32 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid gap-8 md:grid-cols-3 mb-12">
+            {[
+              { t: "Cuts & Styling", d: "Precision cuts, blowouts, and event styling." },
+              { t: "Color & Highlights", d: "Balayage, highlights, and vibrant color." },
+              { t: "Treatments", d: "Deep conditioning, repair, and smoothing." },
+            ].map((x) => (
+              <div key={x.t} className="card p-8 text-center hover:shadow-lg transition-all">
+                <h3 className="text-xl font-semibold mb-3">{x.t}</h3>
+                <p className="text-gray-600 text-base">{x.d}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link href="/services" className="btn-outline">View All Services</Link>
+          </div>
         </div>
       </Section>
 
@@ -224,9 +226,9 @@ async function FAQSection() {
         suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <Section className="py-16">
+      <Section className="py-24 md:py-32">
         <div className="max-w-3xl mx-auto">
-          <h2 className="h2 text-center mb-12">Frequently Asked Questions</h2>
+          <h2 className="h2 text-center mb-16">Frequently Asked Questions</h2>
           <FAQAccordion faqs={faqs} />
         </div>
       </Section>
@@ -303,10 +305,10 @@ async function TestimonialsSection() {
   const others = testimonials.slice(1);
 
   return (
-    <Section className="py-20 bg-gradient-to-b from-white via-gray-50 to-white">
+    <Section className="py-24 md:py-32 bg-gradient-to-b from-white via-gray-50 to-white">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="h2 font-serif mb-4">What Our Clients Say</h2>
+        <div className="text-center mb-20">
+          <h2 className="h2 font-serif mb-6">What Our Clients Say</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">Real transformations, real happiness</p>
         </div>
 

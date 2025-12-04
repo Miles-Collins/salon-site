@@ -4,9 +4,9 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white pt-14 pb-6">
+    <footer className="bg-black text-white pt-24 md:pt-32 pb-8">
       {/* Top contact bar area inspired by reference */}
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 pb-10 md:pb-14">
+      <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16 pb-16 md:pb-24">
         {/* Quicklinks (left) */}
         <div className="md:pr-8">
           <div className="text-xs tracking-[0.3em] uppercase text-white/60 mb-6">Quicklinks</div>
@@ -94,7 +94,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom strip */}
-      <div className="border-t border-white/10 pt-3 pb-1 text-center text-xs text-white/60">
+      <div className="border-t border-white/10 pt-8 pb-4 text-center text-xs text-white/60">
         © {new Date().getFullYear()} Color Rebel by Porscha &nbsp;|&nbsp; <a href="/terms" className="underline">Terms and Conditions</a> &nbsp;|&nbsp; <a href="/privacy" className="underline">Privacy Policy</a>
       </div>
     </footer>

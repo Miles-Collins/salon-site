@@ -65,12 +65,12 @@ export default function GalleryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white pt-20">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white pt-24 md:pt-32">
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <div className="text-center mb-4">
-          <h1 className="text-5xl md:text-6xl font-serif font-semibold tracking-tight mb-4">Gallery</h1>
-          <div className="w-20 h-1 bg-gradient-to-r from-transparent via-[#C9A961] to-transparent mx-auto mb-6"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+        <div className="text-center mb-8">
+          <h1 className="text-5xl md:text-6xl font-serif font-semibold tracking-tight mb-6">Gallery</h1>
+          <div className="w-20 h-1 bg-gradient-to-r from-transparent via-[#C9A961] to-transparent mx-auto mb-8"></div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Explore our latest transformations and premium salon work
           </p>
@@ -78,8 +78,8 @@ export default function GalleryPage() {
       </div>
       
       {/* Masonry Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[200px] md:auto-rows-[250px] gap-3 md:gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[200px] md:auto-rows-[250px] gap-4 md:gap-6">
           {images.map((image, index) => (
             <button
               key={index}

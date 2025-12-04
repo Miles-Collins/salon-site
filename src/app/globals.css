@@ -203,10 +203,32 @@ html, body { background: var(--bg); color: var(--fg); }
   border-top: 2px solid #d4af37;
   border-bottom: 2px solid #d4af37;
 }
-.section { @apply px-4 sm:px-6 py-14 lg:py-20; }
+.section { @apply px-4 sm:px-6 py-20 md:py-24 lg:py-32; }
 .h1 { @apply text-4xl lg:text-5xl font-bold tracking-tight font-serif; }
 .h2 { @apply text-3xl font-semibold tracking-tight font-serif; }
 .muted { @apply text-black/70; }
+
+/* 16px Base Grid System - Spacing utilities */
+.space-xs { @apply gap-2; }
+.space-sm { @apply gap-4; }
+.space-md { @apply gap-6; }
+.space-lg { @apply gap-8; }
+.space-xl { @apply gap-12; }
+.space-2xl { @apply gap-16; }
+
+.px-xs { @apply px-2; }
+.px-sm { @apply px-4; }
+.px-md { @apply px-6; }
+.px-lg { @apply px-8; }
+.px-xl { @apply px-12; }
+
+.py-xs { @apply py-2; }
+.py-sm { @apply py-4; }
+.py-md { @apply py-6; }
+.py-lg { @apply py-8; }
+.py-xl { @apply py-12; }
+.py-2xl { @apply py-16; }
+.py-3xl { @apply py-24; }
 
 /* Subtle underline on hover like reference site */
 .link-underline { @apply relative inline-block; }

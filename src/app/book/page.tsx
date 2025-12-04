@@ -2,21 +2,21 @@ import Link from "next/link";
 
 export default function BookPage() {
   return (
-    <section className="py-20">
-      <div className="max-w-2xl mx-auto text-center">
-        <h1 className="text-4xl md:text-5xl font-light mb-6">Book Your Appointment</h1>
-        <p className="text-lg text-black/70 mb-8">
+    <section className="py-32 md:py-40">
+      <div className="max-w-3xl mx-auto px-4 text-center">
+        <h1 className="text-5xl md:text-6xl font-serif font-semibold mb-8">Book Your Appointment</h1>
+        <p className="text-xl text-gray-700 mb-12 leading-relaxed">
           Ready to transform your look? Click below to view services and book your appointment through our secure booking system.
         </p>
         <Link
           href="https://porschacradic.glossgenius.com/services"
-          className="btn-accent inline-block px-8 py-4 text-lg"
+          className="btn-accent inline-block px-10 py-4 text-lg font-semibold"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
         >
           Book Now on GlossGenius
         </Link>
-        <p className="text-sm text-black/60 mt-6">
+        <p className="text-base text-gray-600 mt-8">
           You&apos;ll be redirected to our secure booking page
         </p>
       </div>
