@@ -248,7 +248,53 @@ async function TestimonialsSection() {
     .order("created_at", { ascending: false })
     .limit(10);
 
-  const testimonials = data || [];
+  // Use real data if available, otherwise use fake testimonials for preview
+  let testimonials = data || [];
+  
+  if (testimonials.length === 0) {
+    testimonials = [
+      {
+        id: "fake-1",
+        client_name: "Sarah Mitchell",
+        quote: "Porscha completely transformed my look! The color is vibrant and exactly what I envisioned. She's so attentive to detail.",
+        rating: 5,
+        service: "Balayage & Cut",
+        photo_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop",
+      },
+      {
+        id: "fake-2",
+        client_name: "Jessica Rodriguez",
+        quote: "Best salon experience I've had. The one-on-one attention made all the difference. My hair has never looked better!",
+        rating: 5,
+        service: "Color Correction",
+        photo_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&h=96&fit=crop",
+      },
+      {
+        id: "fake-3",
+        client_name: "Amanda Chen",
+        quote: "The extensions are flawless and blend perfectly. Porscha really knows her craft. Highly recommend!",
+        rating: 5,
+        service: "Hair Extensions",
+        photo_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=96&h=96&fit=crop",
+      },
+      {
+        id: "fake-4",
+        client_name: "Michelle Thompson",
+        quote: "From consultation to final result, everything was perfect. She listened to what I wanted and delivered beyond expectations.",
+        rating: 5,
+        service: "Cut & Style",
+        photo_url: "https://images.unsplash.com/photo-1517097457149-a46b5f10e248?w=96&h=96&fit=crop",
+      },
+      {
+        id: "fake-5",
+        client_name: "Katie Wilson",
+        quote: "The relaxing atmosphere and professional service kept me coming back. Love my new look every time!",
+        rating: 5,
+        service: "Vivid Color",
+        photo_url: "https://images.unsplash.com/photo-1516080804080-5d0edd5b9355?w=96&h=96&fit=crop",
+      },
+    ];
+  }
 
   if (testimonials.length === 0) return null;
 
