@@ -246,33 +246,104 @@ async function TestimonialsSection() {
     .eq("is_featured", true)
     .order("display_order", { ascending: false })
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(10);
 
   const testimonials = data || [];
 
   if (testimonials.length === 0) return null;
 
+  // Separate featured testimonial (first one) from others
+  const featured = testimonials[0];
+  const others = testimonials.slice(1);
+
   return (
-    <Section className="py-16 bg-gray-50">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="h2 text-center mb-12">What Our Clients Say</h2>
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((t: any) => (
-            <div key={t.id} className="card p-6 bg-white">
-              {t.rating && (
-                <div className="text-brand-accent text-lg mb-3">
-                  {"★".repeat(t.rating)}{"☆".repeat(5 - t.rating)}
-                </div>
-              )}
-              <p className="text-gray-700 italic mb-4">&ldquo;{t.quote}&rdquo;</p>
-              <div className="text-sm font-semibold">{t.client_name}</div>
-              {t.service && <div className="text-xs text-gray-500">{t.service}</div>}
-            </div>
-          ))}
+    <Section className="py-20 bg-gradient-to-b from-white via-gray-50 to-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="h2 font-serif mb-4">What Our Clients Say</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">Real transformations, real happiness</p>
         </div>
+
+        {/* Featured Testimonial - Large Premium Card */}
+        {featured && (
+          <div className="mb-16 fade-in-up">
+            <div className="relative bg-white rounded-3xl shadow-lg p-8 md:p-12 border-t-4 border-b-4 border-[#C9A961]">
+              {/* Large decorative quote mark */}
+              <div className="absolute top-6 left-6 md:top-8 md:left-8 text-6xl md:text-8xl text-[#C9A961]/20 font-serif leading-none">&ldquo;</div>
+              
+              <div className="relative z-10">
+                {featured.photo_url && (
+                  <div className="flex items-center gap-4 md:gap-6 mb-6">
+                    <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-[#C9A961] flex-shrink-0">
+                      <Image
+                        src={featured.photo_url}
+                        alt={featured.client_name}
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-[#C9A961] text-xl md:text-2xl mb-2">
+                        {"★".repeat(featured.rating || 5)}
+                      </div>
+                      <div className="font-semibold text-lg text-black">{featured.client_name}</div>
+                      {featured.service && <div className="text-sm text-gray-600">{featured.service}</div>}
+                    </div>
+                  </div>
+                )}
+                <p className="text-lg md:text-xl text-gray-800 italic leading-relaxed">&ldquo;{featured.quote}&rdquo;</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Secondary Testimonials Grid */}
+        {others.length > 0 && (
+          <div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {others.map((t: any) => (
+                <div key={t.id} className="carousel-item fade-in-up">
+                  <div className="bg-white rounded-2xl shadow-md p-6 h-full flex flex-col border-l-4 border-[#C9A961] hover:shadow-lg transition-shadow">
+                    {/* Small decorative quote */}
+                    <div className="text-3xl text-[#C9A961]/30 font-serif leading-none mb-2">&ldquo;</div>
+                    
+                    {t.rating && (
+                      <div className="text-[#C9A961] text-base mb-3 flex gap-1">
+                        {"★".repeat(t.rating)}{"☆".repeat(5 - t.rating)}
+                      </div>
+                    )}
+                    
+                    <p className="text-gray-700 italic flex-grow mb-4 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                    
+                    <div className="border-t border-gray-200 pt-4">
+                      <div className="flex items-center gap-3">
+                        {t.photo_url && (
+                          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#C9A961] flex-shrink-0">
+                            <Image
+                              src={t.photo_url}
+                              alt={t.client_name}
+                              width={48}
+                              height={48}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div>
+                          <div className="text-sm font-semibold text-black">{t.client_name}</div>
+                          {t.service && <div className="text-xs text-gray-500">{t.service}</div>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         
         {/* Google Reviews CTA */}
-        <div className="mt-12 flex justify-center">
+        <div className="mt-16 flex justify-center fade-in-up">
           <GoogleReviews />
         </div>
       </div>
