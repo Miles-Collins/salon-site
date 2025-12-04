@@ -21,7 +21,7 @@ type DeleteConfirmation = {
 
 export default function GalleryManager() {
   const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmation>({
@@ -191,37 +191,45 @@ export default function GalleryManager() {
       </div>
 
       {items.length === 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-900 mb-3">
-            No images found in Supabase storage. Migrate hardcoded gallery images?
-          </p>
-          <button
-            onClick={async () => {
-              setLoading(true);
-              try {
-                const res = await fetch("/api/owner/migrate-gallery", {
-                  method: "POST",
-                });
-                if (res.ok) {
-                  await refresh();
-                  toast.success("Gallery images migrated!");
-                } else {
-                  const data = await res.json();
-                  throw new Error(data.error || "Migration failed");
-                }
-              } catch (e: any) {
-                setError(e.message);
-                toast.error("Migration failed: " + e.message);
-              } finally {
-                setLoading(false);
-              }
-            }}
-            disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 text-sm font-medium"
-          >
-            {loading ? "Migrating..." : "Migrate Gallery Images"}
-          </button>
-        </div>
+        <>
+          {loading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Loading gallery...</p>
+            </div>
+          ) : (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-900 mb-3">
+                No images found in Supabase storage. Migrate hardcoded gallery images?
+              </p>
+              <button
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const res = await fetch("/api/owner/migrate-gallery", {
+                      method: "POST",
+                    });
+                    if (res.ok) {
+                      await refresh();
+                      toast.success("Gallery images migrated!");
+                    } else {
+                      const data = await res.json();
+                      throw new Error(data.error || "Migration failed");
+                    }
+                  } catch (e: any) {
+                    setError(e.message);
+                    toast.error("Migration failed: " + e.message);
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                disabled={loading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 text-sm font-medium"
+              >
+                {loading ? "Migrating..." : "Migrate Gallery Images"}
+              </button>
+            </div>
+          )}
+        </>
       )}
       
       {items.length === 0 ? (
