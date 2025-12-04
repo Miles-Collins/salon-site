@@ -44,7 +44,7 @@ export default function ContactPage() {
     <Section>
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <h1 className="h2 mb-6 sm:mb-8 text-3xl sm:text-4xl">Get in Touch</h1>
-        <p className="text-base sm:text-lg text-gray-600 mb-8 sm:mb-12 leading-relaxed">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+        <p className="text-base sm:text-lg text-gray-600 mb-8 sm:mb-12 leading-relaxed">Have questions? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.</p>
         
         <div className="grid gap-8 sm:gap-12 md:grid-cols-3">
           {/* Contact Form */}
