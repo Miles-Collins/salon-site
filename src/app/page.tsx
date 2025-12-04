@@ -117,7 +117,7 @@ export default async function HomePage() {
             }
           ],
           sameAs: [
-            "https://instagram.com/colorrebelporschas",
+            "https://www.instagram.com/colorrebelporscha/",
             "https://facebook.com/ColorRebelByPorscha"
           ],
           founder: {
