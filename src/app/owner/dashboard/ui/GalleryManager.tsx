@@ -97,12 +97,20 @@ export default function GalleryManager() {
     setError(null);
     try {
       const res = await fetch("/api/owner/gallery/list");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `HTTP ${res.status}`);
+      }
       const json = await res.json();
+      console.log("Gallery items loaded:", json.items?.length);
       setItems(json.items || []);
-      toast.info("Gallery loaded");
+      if (json.items?.length === 0) {
+        setError(null);
+      }
     } catch (e: any) {
+      console.error("Gallery load error:", e);
       setError(e?.message || "Failed to load gallery");
-      toast.error("Failed to load gallery");
+      toast.error("Failed to load gallery: " + (e?.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -179,7 +187,14 @@ export default function GalleryManager() {
         {loading && <span className="text-sm text-gray-500">Working…</span>}
         {error && <span className="text-sm text-red-600">{error}</span>}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      {items.length === 0 ? (
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+          <p className="text-gray-500 text-sm mb-2">No images in gallery yet</p>
+          <p className="text-gray-400 text-xs">Upload your first image using the file picker above</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((it) => (
           <div 
             key={it.name} 
@@ -189,12 +204,13 @@ export default function GalleryManager() {
           >
             <div className="relative group">
               <div className="relative w-full h-40 bg-gray-100 rounded overflow-hidden">
-                <Image
+                <img
                   src={it.url}
                   alt={it.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error("Image load error:", it.url, e);
+                  }}
                 />
               </div>
               <button
@@ -286,7 +302,8 @@ export default function GalleryManager() {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm.isOpen && (
