@@ -179,15 +179,26 @@ export default function GalleryManager() {
               </div>
               {it.is_before_after && (
                 <div>
-                  <label className="block text-xs text-gray-600">Before Image (filename)</label>
-                  <input
-                    type="text"
-                    className="w-full border rounded px-2 py-1"
+                  <label htmlFor={`before-image-${it.name}`} className="block text-xs text-gray-600 mb-2">Before Image (select from gallery)</label>
+                  <select
+                    id={`before-image-${it.name}`}
+                    className="w-full border rounded px-2 py-1 text-sm"
                     value={it.before_image || ""}
-                    onChange={(e) => updateItem(it.name, { before_image: e.target.value })}
-                    placeholder="e.g. before-photo.jpg"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Enter the filename of the before image (must be already uploaded)</p>
+                    onChange={(e) => updateItem(it.name, { before_image: e.target.value || null })}
+                    title="Select before image"
+                  >
+                    <option value="">-- Select a before image --</option>
+                    {items
+                      .filter((img) => img.name !== it.name)
+                      .map((img) => (
+                        <option key={img.name} value={img.name}>
+                          {img.name}
+                        </option>
+                      ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    This image will be shown with the slider on the left side
+                  </p>
                 </div>
               )}
               <div className="flex justify-end gap-2">

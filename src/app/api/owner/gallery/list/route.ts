@@ -31,7 +31,7 @@ export async function GET() {
   // Fetch metadata rows
   const { data: metaRows } = await supabase
     .from("gallery_images")
-    .select("name, caption, tags, display_order, created_at");
+    .select("name, caption, tags, display_order, created_at, is_before_after, before_image");
   const metaMap = new Map((metaRows || []).map((m) => [m.name, m]));
 
   const items = (data || [])
@@ -44,6 +44,8 @@ export async function GET() {
         caption: meta?.caption || null,
         tags: meta?.tags || [],
         display_order: meta?.display_order ?? null,
+        is_before_after: meta?.is_before_after || false,
+        before_image: meta?.before_image || null,
       };
     })
     .sort((a, b) => {
