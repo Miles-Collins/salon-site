@@ -116,18 +116,18 @@ export default async function HomePage() {
             width={300}
             height={300}
             priority
-            className="w-64 xs:w-72 sm:w-80 h-auto drop-shadow-2xl logo-glow"
+            className="w-56 xs:w-64 sm:w-72 h-auto drop-shadow-2xl logo-glow"
           />
         </div>
   <div className="relative z-10 text-center w-full px-4 md:px-4 flex-col items-center justify-center h-full hidden md:flex">
           {/* Text only - no logo on tablet/desktop */}
-          <h1 className="text-5xl md:text-7xl font-serif font-semibold leading-tight mb-8">
+          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-serif font-semibold leading-tight mb-6 md:mb-8">
             <span className="block text-outline-white font-light tracking-wide">{heroTitle}</span>
             <span className="block text-cheetah">{heroSubtitle}</span>
           </h1>
           <Link
             href="/book"
-            className="inline-block border border-white/80 text-white px-7 py-3 text-base md:text-lg font-semibold tracking-wide hover:bg-white/10 hover:border-white transition-all hover:shadow-lg hover:scale-105"
+            className="inline-flex items-center justify-center gap-2 border border-white/80 text-white px-6 py-3 sm:px-7 sm:py-4 text-base md:text-lg font-semibold tracking-wide hover:bg-white/10 hover:border-white transition-all hover:shadow-lg hover:-translate-y-1 min-h-12"
           >
             BOOK NOW
           </Link>

@@ -42,11 +42,11 @@ export default function ContactPage() {
 
   return (
     <Section>
-      <div className="max-w-4xl mx-auto">
-        <h1 className="h2 mb-8">Get in Touch</h1>
-        <p className="text-lg text-gray-600 mb-12">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <h1 className="h2 mb-6 sm:mb-8 text-3xl sm:text-4xl">Get in Touch</h1>
+        <p className="text-base sm:text-lg text-gray-600 mb-8 sm:mb-12 leading-relaxed">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
         
-        <div className="grid gap-12 md:grid-cols-3">
+        <div className="grid gap-8 sm:gap-12 md:grid-cols-3">
           {/* Contact Form */}
           <div className="md:col-span-2">
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -59,7 +59,7 @@ export default function ContactPage() {
                   onChange={handleChange}
                   required
                   disabled={isLoading}
-                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20 transition disabled:bg-gray-50 disabled:opacity-60"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20 transition disabled:bg-gray-50 disabled:opacity-60 min-h-12 text-base"
                   placeholder="Your name"
                 />
               </div>
@@ -73,7 +73,7 @@ export default function ContactPage() {
                   onChange={handleChange}
                   required
                   disabled={isLoading}
-                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20 transition disabled:bg-gray-50 disabled:opacity-60"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20 transition disabled:bg-gray-50 disabled:opacity-60 min-h-12 text-base"
                   placeholder="your@email.com"
                 />
               </div>
@@ -86,7 +86,7 @@ export default function ContactPage() {
                   value={formState.phone}
                   onChange={handleChange}
                   disabled={isLoading}
-                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20 transition disabled:bg-gray-50 disabled:opacity-60"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20 transition disabled:bg-gray-50 disabled:opacity-60 min-h-12 text-base"
                   placeholder="(913) 680-7987"
                 />
               </div>
@@ -100,7 +100,7 @@ export default function ContactPage() {
                   required
                   disabled={isLoading}
                   rows={5}
-                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20 transition disabled:bg-gray-50 disabled:opacity-60 resize-none"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-[#C9A961] focus:ring-2 focus:ring-[#C9A961]/20 transition disabled:bg-gray-50 disabled:opacity-60 resize-none text-base"
                   placeholder="Tell us what you need..."
                 />
               </div>
@@ -108,7 +108,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={isLoading || submitted}
-                className={`w-full py-3 px-6 rounded-lg font-semibold uppercase tracking-wider transition duration-300 flex items-center justify-center gap-2 ${
+                className={`w-full py-4 px-6 rounded-lg font-semibold uppercase tracking-wider transition duration-300 flex items-center justify-center gap-2 min-h-12 text-base sm:text-lg ${
                   submitted
                     ? "bg-green-500 text-white"
                     : isLoading

@@ -20,17 +20,17 @@ export default function BookPage() {
   };
 
   return (
-    <section className="py-32 md:py-40">
-      <div className="max-w-3xl mx-auto px-4 text-center">
-        <h1 className="text-5xl md:text-6xl font-serif font-semibold mb-8">Book Your Appointment</h1>
-        <p className="text-xl text-gray-700 mb-12 leading-relaxed">
+    <section className="py-24 sm:py-32 md:py-40">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-semibold mb-6 sm:mb-8">Book Your Appointment</h1>
+        <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-8 sm:mb-12 leading-relaxed px-2">
           Ready to transform your look? Click below to view services and book your appointment through our secure booking system.
         </p>
         
         <button
           onClick={handleClick}
           disabled={isLoading}
-          className={`inline-flex items-center justify-center gap-2 px-10 py-4 text-lg font-semibold rounded-lg transition duration-300 ${
+          className={`inline-flex items-center justify-center gap-2 px-8 sm:px-10 py-4 text-base sm:text-lg font-semibold rounded-lg transition duration-300 min-h-12 ${
             completed
               ? "bg-green-500 text-white shadow-lg"
               : isLoading
@@ -51,26 +51,26 @@ export default function BookPage() {
           )}
         </button>
         
-        <p className="text-base text-gray-600 mt-8">
+        <p className="text-sm sm:text-base text-gray-600 mt-6 sm:mt-8">
           You&apos;ll be redirected to our secure booking page
         </p>
 
         {/* Feature highlights */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-6 bg-white rounded-lg border border-gray-200 hover:border-[#C9A961] hover:shadow-lg transition duration-300">
+        <div className="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+          <div className="p-5 sm:p-6 bg-white rounded-lg border border-gray-200 hover:border-[#C9A961] hover:shadow-lg transition duration-300 min-h-24 flex flex-col justify-center">
             <div className="text-3xl mb-3">⏰</div>
-            <h3 className="font-semibold text-gray-900 mb-2">Easy Scheduling</h3>
-            <p className="text-sm text-gray-600">Book instantly with real-time availability</p>
+            <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Easy Scheduling</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Book instantly with real-time availability</p>
           </div>
-          <div className="p-6 bg-white rounded-lg border border-gray-200 hover:border-[#C9A961] hover:shadow-lg transition duration-300">
+          <div className="p-5 sm:p-6 bg-white rounded-lg border border-gray-200 hover:border-[#C9A961] hover:shadow-lg transition duration-300 min-h-24 flex flex-col justify-center">
             <div className="text-3xl mb-3">🔒</div>
-            <h3 className="font-semibold text-gray-900 mb-2">Secure & Safe</h3>
-            <p className="text-sm text-gray-600">Protected by industry-standard security</p>
+            <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Secure & Safe</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Protected by industry-standard security</p>
           </div>
-          <div className="p-6 bg-white rounded-lg border border-gray-200 hover:border-[#C9A961] hover:shadow-lg transition duration-300">
+          <div className="p-5 sm:p-6 bg-white rounded-lg border border-gray-200 hover:border-[#C9A961] hover:shadow-lg transition duration-300 min-h-24 flex flex-col justify-center">
             <div className="text-3xl mb-3">📲</div>
-            <h3 className="font-semibold text-gray-900 mb-2">Instant Reminders</h3>
-            <p className="text-sm text-gray-600">Get notifications before your appointment</p>
+            <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Instant Reminders</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Get notifications before your appointment</p>
           </div>
         </div>
       </div>
