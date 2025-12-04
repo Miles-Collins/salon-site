@@ -101,11 +101,13 @@ export default async function HomePage() {
           fill
           priority
           placeholder="blur"
-          className="absolute inset-0 object-cover object-center opacity-80"
+          className="absolute inset-0 object-cover object-center opacity-80 transform-gpu"
+          style={{ transform: 'translateZ(0)' }}
           sizes="(min-width: 1280px) 1280px, 100vw"
           quality={70}
         />
-        <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-black/60 to-black/20" />
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-black/70 via-black/40 to-black/30" />
+        <div className="absolute inset-0 w-full h-full grain-overlay" />
         {/* Mobile: centered logo overlay */}
         <div className="relative z-10 flex md:hidden items-center justify-center h-full">
           <Image
@@ -114,7 +116,7 @@ export default async function HomePage() {
             width={300}
             height={300}
             priority
-            className="w-64 xs:w-72 sm:w-80 h-auto drop-shadow-2xl"
+            className="w-64 xs:w-72 sm:w-80 h-auto drop-shadow-2xl logo-glow"
           />
         </div>
   <div className="relative z-10 text-center w-full px-4 md:px-4 flex-col items-center justify-center h-full hidden md:flex">
@@ -129,6 +131,14 @@ export default async function HomePage() {
           >
             BOOK NOW
           </Link>
+        </div>
+        {/* Scroll down indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="scroll-indicator text-white/60">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
         </div>
       </div>
 

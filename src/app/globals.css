@@ -18,6 +18,44 @@
 	animation: announcement-marquee 20s linear infinite;
 }
 
+/* Parallax effect for hero background */
+@supports (background-attachment: fixed) {
+	.hero-parallax {
+		background-attachment: fixed;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+	}
+}
+
+/* Scroll down indicator animation */
+@keyframes scroll-indicator {
+	0%, 20% { opacity: 1; transform: translateY(0); }
+	50% { opacity: 0.5; }
+	100% { opacity: 0; transform: translateY(12px); }
+}
+
+.scroll-indicator {
+	animation: scroll-indicator 2.5s ease-in-out infinite;
+}
+
+/* Logo glow effect */
+@keyframes logo-glow {
+	0%, 100% { filter: drop-shadow(0 0 8px rgba(217, 119, 249, 0.3)); }
+	50% { filter: drop-shadow(0 0 16px rgba(217, 119, 249, 0.6)); }
+}
+
+.logo-glow {
+	animation: logo-glow 3s ease-in-out infinite;
+}
+
+/* Subtle grain texture overlay */
+.grain-overlay {
+	background-image: 
+		url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' result='noise' /%3E%3CfeColorMatrix in='noise' type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+	pointer-events: none;
+}
+
 /* Script/cursive display font utility for hero accents */
 .font-script {
 	font-family: "Brush Script MT", "Segoe Script", "Lucida Handwriting", "Dancing Script", cursive;
