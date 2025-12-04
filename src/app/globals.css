@@ -172,6 +172,27 @@ select:focus {
 	animation: gallery-reveal 0.6s ease-out;
 }
 
+/* Service card entrance animation */
+@keyframes service-card-enter {
+	from { opacity: 0; transform: translateY(20px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+.service-card {
+	animation: service-card-enter 0.5s ease-out forwards;
+}
+
+/* Staggered service card animation delays */
+.grid > div:nth-child(1) .service-card { animation-delay: 0s; }
+.grid > div:nth-child(2) .service-card { animation-delay: 0.1s; }
+.grid > div:nth-child(3) .service-card { animation-delay: 0.2s; }
+.grid > div:nth-child(4) .service-card { animation-delay: 0.3s; }
+.grid > div:nth-child(5) .service-card { animation-delay: 0.4s; }
+.grid > div:nth-child(6) .service-card { animation-delay: 0.5s; }
+.grid > div:nth-child(7) .service-card { animation-delay: 0.6s; }
+.grid > div:nth-child(8) .service-card { animation-delay: 0.7s; }
+.grid > div:nth-child(9) .service-card { animation-delay: 0.8s; }
+
 /* Subtle grain texture overlay */
 .grain-overlay {
 	background-image: 
