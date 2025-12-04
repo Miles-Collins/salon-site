@@ -5,13 +5,30 @@ import CategoryNav from "@/components/CategoryNav";
 import { Dancing_Script } from "next/font/google";
 import Image from "next/image";
 import servicesHero from "../../../public/services-hero.jpg";
+import type { Metadata } from "next";
+import BreadcrumbSchema from "@/components/BreadcrumbSchema";
 
 const dancing = Dancing_Script({ subsets: ["latin"], weight: ["700"] });
+
+export const metadata: Metadata = {
+  title: "Hair Services & Pricing",
+  description: "Explore our complete range of professional hair services including precision cuts, vivid color, balayage, highlights, extensions, and treatments. Transparent pricing and easy online booking.",
+  openGraph: {
+    title: "Hair Services & Pricing | Color Rebel by Porscha",
+    description: "Professional hair services: cuts, color, balayage, extensions & treatments. View our full menu and pricing.",
+    url: "https://colorrebelbyporscha.com/services",
+    images: [{ url: "/api/og?page=services", width: 1200, height: 630, alt: "Color Rebel Services" }],
+  },
+};
 
 export default function ServicesPage() {
   const categories = serviceCategories;
   return (
     <>
+      <BreadcrumbSchema items={[
+        { name: "Home", url: "/" },
+        { name: "Services", url: "/services" }
+      ]} />
       {/* Mini Hero Section */}
       <div id="services-hero" className="relative w-full h-[360px] md:h-[460px] mb-16 md:mb-24 flex items-center overflow-hidden">
         <Image

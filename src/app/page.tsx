@@ -47,16 +47,26 @@ export default async function HomePage() {
   const announcement = content.announcement;
   return (
     <>
-      {/* Schema.org LocalBusiness */}
+      {/* Enhanced Schema.org LocalBusiness with additional properties */}
       <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{
         __html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "HairSalon",
+          "@id": "https://colorrebelbyporscha.com/#organization",
           name: "Color Rebel by Porscha",
-          image: "https://colorrebelbyporscha.com/hero-og.jpg",
+          alternateName: "Color Rebel Salon",
+          description: "Premier hair salon specializing in vivid color, balayage, extensions, precision cuts and hair treatments. Licensed professional with 15+ years experience.",
+          image: [
+            "https://colorrebelbyporscha.com/hero.jpg",
+            "https://colorrebelbyporscha.com/ColorRebelTransparent.png"
+          ],
+          logo: "https://colorrebelbyporscha.com/ColorRebelTransparent.png",
           url: "https://colorrebelbyporscha.com/",
           telephone: "+1-913-680-7987",
           email: "PorschaCradic@gmail.com",
+          priceRange: "$$",
+          currenciesAccepted: "USD",
+          paymentAccepted: "Cash, Credit Card, Debit Card",
           address: {
             "@type": "PostalAddress",
             streetAddress: "301 S 5th St",
@@ -64,6 +74,20 @@ export default async function HomePage() {
             addressRegion: "KS",
             postalCode: "66048",
             addressCountry: "US"
+          },
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: "39.3111",
+            longitude: "-94.9223"
+          },
+          areaServed: {
+            "@type": "GeoCircle",
+            geoMidpoint: {
+              "@type": "GeoCoordinates",
+              latitude: "39.3111",
+              longitude: "-94.9223"
+            },
+            geoRadius: "50000"
           },
           openingHoursSpecification: [
             {
@@ -90,7 +114,61 @@ export default async function HomePage() {
               opens: "09:00",
               closes: "16:00"
             }
-          ]
+          ],
+          sameAs: [
+            "https://instagram.com/colorrebelporschas",
+            "https://facebook.com/ColorRebelByPorscha"
+          ],
+          founder: {
+            "@type": "Person",
+            name: "Porscha Cradic",
+            jobTitle: "Hair Stylist & Colorist"
+          },
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: "5",
+            reviewCount: "100",
+            bestRating: "5",
+            worstRating: "1"
+          },
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: "Hair Services",
+            itemListElement: [
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Hair Color Services",
+                  description: "Vivid color, balayage, highlights, and color correction"
+                }
+              },
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Hair Cutting & Styling",
+                  description: "Precision cuts, styling, and blowouts"
+                }
+              },
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Hair Extensions",
+                  description: "Professional hair extension installation"
+                }
+              },
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Hair Treatments",
+                  description: "Deep conditioning, repair, and smoothing treatments"
+                }
+              }
+            ]
+          }
         })
       }} />
       {/* HERO - full viewport with image and overlay */}

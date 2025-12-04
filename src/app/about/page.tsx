@@ -1,9 +1,27 @@
 import Section from "@/components/Section";
+import type { Metadata } from "next";
+import BreadcrumbSchema from "@/components/BreadcrumbSchema";
+
+export const metadata: Metadata = {
+  title: "About Porscha",
+  description: "Meet Porscha - Licensed professional hair stylist with 15+ years experience. Specialized training in color, cutting, and texture. Certified in advanced techniques and hair health treatments.",
+  openGraph: {
+    title: "About Porscha | Color Rebel by Porscha",
+    description: "Licensed professional with 15+ years experience. Specialized in color, cutting, and all hair textures.",
+    url: "https://colorrebelbyporscha.com/about",
+    images: [{ url: "/api/og?page=about", width: 1200, height: 630, alt: "About Porscha" }],
+  },
+};
 
 export default function AboutPage() {
   return (
-    <Section>
-      <div className="max-w-4xl mx-auto">
+    <>
+      <BreadcrumbSchema items={[
+        { name: "Home", url: "/" },
+        { name: "About", url: "/about" }
+      ]} />
+      <Section>
+        <div className="max-w-4xl mx-auto">
         <h1 className="h2 mb-8">About Porscha</h1>
         <p className="text-lg text-gray-700 leading-relaxed mb-12">
           Porscha specializes in personalized cuts, color, and healthy-hair treatments with a focus on
@@ -73,8 +91,9 @@ export default function AboutPage() {
             Consultation-first, texture-aware, and product-smart — so your style looks great in the chair
             and at home.
           </p>
+          </div>
         </div>
-      </div>
-    </Section>
+      </Section>
+    </>
   );
 }
