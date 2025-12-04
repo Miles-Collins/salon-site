@@ -20,7 +20,8 @@
     "papaparse": "^5.4.1",
     "recharts": "^2.12.3",
     "zod": "^3.23.8",
-    "@clerk/nextjs": "^5.3.3"
+    "@clerk/nextjs": "^5.3.3",
+    "web-vitals": "^4.2.4"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { trackBookingClick } from '@/lib/analytics';
 
 const GLOSS_GENIUS_URL = 'https://porschacradic.glossgenius.com/services';
 
@@ -10,6 +11,7 @@ export default function BookServiceButton({ className }: { className?: string })
   const [completed, setCompleted] = useState(false);
 
   const handleBookClick = () => {
+    trackBookingClick('service_page_button');
     setIsLoading(true);
     setShowModal(true);
     // Simulate loading then redirect

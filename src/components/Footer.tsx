@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { trackSocialClick, trackFormSubmission } from "@/lib/analytics";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -16,10 +17,12 @@ export default function Footer() {
       // Simulate newsletter subscription
       await new Promise(resolve => setTimeout(resolve, 800));
       setSubscribeStatus("success");
+      trackFormSubmission('newsletter', true);
       setEmail("");
       setTimeout(() => setSubscribeStatus("idle"), 3000);
     } catch (error) {
       setSubscribeStatus("error");
+      trackFormSubmission('newsletter', false);
       setTimeout(() => setSubscribeStatus("idle"), 3000);
     }
   };
@@ -166,10 +169,10 @@ export default function Footer() {
         <div className="relative md:px-10 md:border-x md:border-white/10">
           <div className="text-5xl md:text-6xl font-light tracking-wider text-center mb-6">COLOR REBEL</div>
           <div className="flex items-center justify-center gap-6 mb-6">
-            <a href="https://instagram.com/colorrebelporschas" target="_blank" rel="noopener" aria-label="Instagram" className="social-icon-glow text-white hover:text-[#C9A961]">
+            <a href="https://instagram.com/colorrebelporschas" target="_blank" rel="noopener" aria-label="Instagram" className="social-icon-glow text-white hover:text-[#C9A961]" onClick={() => trackSocialClick('instagram')}>
               <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="7" strokeWidth="2"/><rect x="17" y="7" width="2" height="2" rx="1"/><rect x="2" y="2" width="20" height="20" rx="6" strokeWidth="2"/></svg>
             </a>
-            <a href="https://facebook.com/ColorRebelByPorscha" target="_blank" rel="noopener" aria-label="Facebook" className="social-icon-glow text-white hover:text-[#C9A961]">
+            <a href="https://facebook.com/ColorRebelByPorscha" target="_blank" rel="noopener" aria-label="Facebook" className="social-icon-glow text-white hover:text-[#C9A961]" onClick={() => trackSocialClick('facebook')}>
               <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h5v-7h-2v-3h2V9a3 3 0 0 1 3-3h2v3h-2v3h2v7h2a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5z" strokeWidth="2"/></svg>
             </a>
             <a href="mailto:PorschaCradic@gmail.com" aria-label="Email" className="social-icon-glow text-white hover:text-[#C9A961]">

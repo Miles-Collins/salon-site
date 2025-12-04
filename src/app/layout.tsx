@@ -7,6 +7,10 @@ import ChatWidget from "@/components/ChatWidget";
 import { ClerkProvider } from "@clerk/nextjs";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { ToastProvider } from "@/components/Toast";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import FacebookPixel from "@/components/FacebookPixel";
+import Analytics from "@/components/Analytics";
+import WebVitals from "@/components/WebVitals";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://colorrebelbyporscha.com'),
@@ -74,6 +78,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-screen antialiased flex flex-col">
+        <GoogleAnalytics />
+        <FacebookPixel />
         {publishableKey ? (
           <ClerkProvider 
             publishableKey={publishableKey as string}
@@ -81,6 +87,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             signUpFallbackRedirectUrl="/owner/dashboard"
           >
             <ToastProvider>
+              <Analytics />
+              <WebVitals />
               {/* Unified header container: navbar + announcement banner (mobile: banner above nav) */}
               <header className="fixed top-0 left-0 w-full z-50">
                 <div className="flex flex-col">
@@ -100,6 +108,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ClerkProvider>
         ) : (
           <>
+            <Analytics />
+            <WebVitals />
             <header className="fixed top-0 left-0 w-full z-50">
               <div className="flex flex-col">
                 <div className="order-2 md:order-1">
