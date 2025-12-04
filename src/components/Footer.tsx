@@ -201,6 +201,22 @@ export default function Footer() {
           <div className="text-xs tracking-[0.3em] uppercase text-white/60 mb-6">About</div>
           <p className="text-sm text-white/70 leading-relaxed mb-6">Premium beauty and styling services in Leavenworth. Experience luxury with our expert team.</p>
           
+          {/* Trust Badges */}
+          <div className="mb-6 space-y-3">
+            <div className="flex items-center gap-2 text-sm text-white/80">
+              <span className="text-[#C9A961]">✓</span>
+              <span>Licensed Professional</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-white/80">
+              <span className="text-[#C9A961]">✓</span>
+              <span>15+ Years Experience</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-white/80">
+              <span className="text-[#C9A961]">✓</span>
+              <span>Insured & Certified</span>
+            </div>
+          </div>
+          
           <div className="text-xs tracking-[0.3em] uppercase text-white/60 mb-4">Reviews</div>
           <a
             href="https://www.google.com/maps/search/?api=1&query=Color+Rebel+by+Porscha+Leavenworth+KS"

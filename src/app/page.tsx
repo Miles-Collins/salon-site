@@ -158,6 +158,30 @@ export default async function HomePage() {
         </div>
       </Section>
 
+      {/* Trust Elements / Stats */}
+      <Section className="py-16 md:py-20 bg-gradient-to-br from-[#C9A961]/5 to-[#B8985A]/5">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-lg hover:bg-white/80 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold text-[#C9A961] mb-2">15+</div>
+              <p className="text-sm md:text-base text-gray-700 font-medium">Years Experience</p>
+            </div>
+            <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-lg hover:bg-white/80 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold text-[#C9A961] mb-2">100%</div>
+              <p className="text-sm md:text-base text-gray-700 font-medium">Licensed & Insured</p>
+            </div>
+            <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-lg hover:bg-white/80 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold text-[#C9A961] mb-2">500+</div>
+              <p className="text-sm md:text-base text-gray-700 font-medium">Happy Clients</p>
+            </div>
+            <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-lg hover:bg-white/80 transition-all duration-300">
+              <div className="text-4xl md:text-5xl font-bold text-[#C9A961] mb-2">5★</div>
+              <p className="text-sm md:text-base text-gray-700 font-medium">Average Rating</p>
+            </div>
+          </div>
+        </div>
+      </Section>
+
       {/* Services Preview */}
       <Section className="py-24 md:py-32 bg-gray-50">
         <div className="max-w-6xl mx-auto">
