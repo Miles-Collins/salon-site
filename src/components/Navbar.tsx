@@ -103,7 +103,7 @@ export default function Navbar() {
               </nav>
               <Link
                 href="/book"
-                className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gold-default/90 text-black font-semibold uppercase tracking-wide text-sm hover:bg-gold-default hover:shadow-lg hover:scale-105 transition-all duration-200"
+                className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#C9A961] text-black font-semibold uppercase tracking-wide text-sm hover:bg-[#B8985A] hover:shadow-lg hover:scale-105 transition-all duration-200"
               >
                 📅 Book Now
               </Link>
@@ -147,7 +147,7 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
-              <Link href="/book" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm font-bold bg-gold-default/10 border-b border-black/10 text-gold-default">
+              <Link href="/book" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm font-bold bg-[#C9A961]/10 border-b border-black/10 text-[#C9A961]">
                 📅 Book Now
               </Link>
               {/* Staff Portal / Dashboard link in mobile menu */}

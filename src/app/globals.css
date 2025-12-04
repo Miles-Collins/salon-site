@@ -219,15 +219,15 @@ select:focus {
 
 /* Enhanced navbar styles */
 .navbar-brand-accent {
-	@apply text-gold-default;
+	@apply text-[#C9A961];
 }
 
 .navbar-link-active {
-	@apply text-gold-default;
+	@apply text-[#C9A961];
 }
 
 .navbar-link-hover:hover {
-	@apply text-gold-default;
+	@apply text-[#C9A961];
 }
 
 /* Premium header shadow effect */
