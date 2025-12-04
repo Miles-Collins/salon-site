@@ -70,9 +70,10 @@ export default function ChatSettingsManager() {
     setUploadingAvatar(true);
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("filename", `avatar-${Date.now()}-${file.name}`);
 
     try {
-      const response = await fetch("/api/owner/upload", {
+      const response = await fetch("/api/owner/gallery/upload", {
         method: "POST",
         body: formData,
       });
@@ -80,12 +81,14 @@ export default function ChatSettingsManager() {
       if (response.ok) {
         const data = await response.json();
         setSettings({ ...settings, avatar_url: data.url });
-        setMessage("Avatar uploaded!");
+        setMessage("Avatar uploaded successfully!");
       } else {
-        setMessage("Failed to upload avatar.");
+        const error = await response.json();
+        setMessage(`Failed to upload avatar: ${error.error || 'Unknown error'}`);
       }
     } catch (error) {
       setMessage("Error uploading avatar.");
+      console.error("Avatar upload error:", error);
     } finally {
       setUploadingAvatar(false);
     }
