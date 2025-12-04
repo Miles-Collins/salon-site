@@ -73,7 +73,7 @@ export default function ChatSettingsManager() {
     formData.append("filename", `avatar-${Date.now()}-${file.name}`);
 
     try {
-      const response = await fetch("/api/owner/gallery/upload", {
+      const response = await fetch("/api/owner/avatar/upload", {
         method: "POST",
         body: formData,
       });
