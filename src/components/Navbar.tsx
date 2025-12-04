@@ -35,8 +35,8 @@ export default function Navbar() {
 
   return (
     <div
-      className={`w-full transition-all duration-300 relative
-        ${scrolled ? "bg-black/90 border-b border-black/30 shadow-lg backdrop-blur" : "bg-gradient-to-b from-black/60 to-transparent border-none"}`}
+      className={`w-full sticky top-0 z-50 transition-all duration-300 backdrop-blur-md
+        ${scrolled ? "bg-black/85 border-b border-gold/30 shadow-2xl" : "bg-gradient-to-b from-black/70 to-black/30 border-b border-transparent"}`}
     >
       <div className="w-full flex h-16 items-center px-4 sm:px-5 md:px-6">
         {/* Global error banner (e.g., unauthorized access) */}
@@ -92,20 +92,20 @@ export default function Navbar() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`group relative px-0 py-2 text-sm font-medium uppercase tracking-wide text-white transition ${active ? "text-brand-accent" : "text-white"}`}
+                      className={`group relative px-3 py-2 text-sm font-medium uppercase tracking-wide transition duration-200 ${active ? "text-gold-default" : "text-white/90 hover:text-white"}`}
                     >
                       {item.label}
                       {/* Animated bottom line */}
-                      <span className={`absolute bottom-0 left-0 right-0 h-0.5 bg-brand-accent transition-all duration-300 ${active ? "w-full" : "w-0 group-hover:w-full"}`}></span>
+                      <span className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gold-default transition-all duration-300 ${active ? "w-full" : "w-0 group-hover:w-full"}`}></span>
                     </Link>
                   );
                 })}
               </nav>
               <Link
                 href="/book"
-                className="group text-white text-sm font-semibold uppercase tracking-wide link-underline"
+                className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gold-default/90 text-black font-semibold uppercase tracking-wide text-sm hover:bg-gold-default hover:shadow-lg hover:scale-105 transition-all duration-200"
               >
-                Book
+                📅 Book Now
               </Link>
               {/* Subtle Staff Portal link on all public pages */}
               {isSignedIn ? (
@@ -123,17 +123,17 @@ export default function Navbar() {
           // On owner routes, show a minimal mobile menu with Home link
           <div
             id="mobile-menu"
-            className={`md:hidden absolute left-0 right-0 top-full bg-white text-black border-t border-black/10 shadow-xl overflow-hidden origin-top transform transition-all duration-1000 ease-out 
+            className={`md:hidden absolute left-0 right-0 top-full bg-white text-black border-t border-gold/20 shadow-xl overflow-hidden origin-top transform transition-all duration-300 ease-out 
               ${mobileOpen ? "opacity-100 scale-y-100 max-h-[40vh]" : "opacity-0 scale-y-0 max-h-0 pointer-events-none"}`}
           >
             <div className="py-3">
-              <Link href="/" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm">Home</Link>
+              <Link href="/" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm hover:bg-gold-default/10 transition">Home</Link>
             </div>
           </div>
         ) : (
           <div
           id="mobile-menu"
-          className={`md:hidden absolute left-0 right-0 top-full bg-white text-black border-t border-black/10 shadow-xl overflow-hidden origin-top transform transition-all duration-1000 ease-out 
+          className={`md:hidden absolute left-0 right-0 top-full bg-white text-black border-t border-gold/20 shadow-xl overflow-hidden origin-top transform transition-all duration-300 ease-out 
             ${mobileOpen ? "opacity-100 scale-y-100 max-h-[70vh]" : "opacity-0 scale-y-0 max-h-0 pointer-events-none"}`}
           >
             <div className="py-3">
@@ -147,7 +147,9 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
-              <Link href="/book" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm">Book Now</Link>
+              <Link href="/book" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm font-bold bg-gold-default/10 border-b border-black/10 text-gold-default">
+                📅 Book Now
+              </Link>
               {/* Staff Portal / Dashboard link in mobile menu */}
               {isSignedIn ? (
                 <Link href="/owner/dashboard" className="block px-5 py-3 uppercase tracking-[0.35em] text-sm border-t border-black/10">Dashboard</Link>

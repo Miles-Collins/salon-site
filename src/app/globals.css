@@ -217,7 +217,28 @@ select:focus {
 	background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(201, 169, 97, 0.1) 100%);
 }
 
-/* Jewel tone overlay for testimonials section */
+/* Enhanced navbar styles */
+.navbar-brand-accent {
+	@apply text-gold-default;
+}
+
+.navbar-link-active {
+	@apply text-gold-default;
+}
+
+.navbar-link-hover:hover {
+	@apply text-gold-default;
+}
+
+/* Premium header shadow effect */
+@supports (backdrop-filter: blur(10px)) {
+	.header-blur {
+		-webkit-backdrop-filter: blur(10px);
+		backdrop-filter: blur(10px);
+	}
+}
+
+/* Smooth color transitions for nav */
 .testimonials-overlay {
 	background: radial-gradient(circle at bottom right, rgba(45, 125, 94, 0.03), transparent 70%);
 }
