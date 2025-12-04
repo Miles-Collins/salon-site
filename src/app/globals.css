@@ -80,6 +80,88 @@
 .carousel-item:nth-child(8) { animation-delay: 0.7s; }
 .carousel-item:nth-child(9) { animation-delay: 0.8s; }
 
+/* Lift effect on hover - scale + shadow */
+@keyframes lift {
+	from { transform: translateY(0); }
+	to { transform: translateY(-8px); }
+}
+
+/* Button hover effects */
+.btn:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+	transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-accent:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 24px rgba(217, 119, 249, 0.3);
+	transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-outline:hover {
+	transform: translateY(-4px);
+	background-color: rgba(0, 0, 0, 0.08);
+	border-color: rgba(0, 0, 0, 0.2);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+	transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Card hover effects */
+.card {
+	transition: all 300ms ease;
+}
+
+.card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+	border-top-color: #E879F9;
+	border-bottom-color: #E879F9;
+}
+
+/* Link underline animation - left to right */
+.link-underline::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -2px;
+	height: 2px;
+	background: currentColor;
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.group:hover .link-underline::after, 
+.link-underline:hover::after { 
+	transform: scaleX(1);
+}
+
+/* Form input focus rings with gold */
+input:focus,
+textarea:focus,
+select:focus {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1), 0 0 0 1px #C9A961;
+	transition: box-shadow 200ms ease;
+}
+
+/* Premium button with glow on hover */
+.btn-glow:hover {
+	filter: drop-shadow(0 0 12px rgba(217, 119, 249, 0.6));
+}
+
+/* Color shift on hover for elements with premium feel */
+.premium-hover {
+	transition: all 300ms ease;
+}
+
+.premium-hover:hover {
+	color: #C9A961;
+	filter: drop-shadow(0 2px 8px rgba(201, 169, 97, 0.2));
+}
+
 /* Subtle grain texture overlay */
 .grain-overlay {
 	background-image: 

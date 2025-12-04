@@ -57,10 +57,10 @@ export default function ServicesPage() {
                     <li key={svc.name} className="flex flex-col">
                       {svc.slug ? (
                         <Link href={`/services/${svc.slug}`} className="group">
-                          <div className="flex items-center gap-3">
-                            <span className="font-bold uppercase text-black text-sm md:text-base tracking-wide whitespace-nowrap group-hover:text-gold transition-colors">{svc.name}</span>
-                            <span aria-hidden="true" className="flex-1 border-t border-black/10" />
-                            <span className="text-sm md:text-base font-medium text-black whitespace-nowrap">${svc.price} &amp; up</span>
+                          <div className="flex items-center gap-3 transition-all group-hover:translate-x-1">
+                            <span className="font-bold uppercase text-black text-sm md:text-base tracking-wide whitespace-nowrap premium-hover">{svc.name}</span>
+                            <span aria-hidden="true" className="flex-1 border-t border-black/10 group-hover:border-[#C9A961] transition-colors" />
+                            <span className="text-sm md:text-base font-medium text-black group-hover:text-[#C9A961] transition-colors whitespace-nowrap">${svc.price} &amp; up</span>
                           </div>
                           <p className="text-sm text-black/60 mt-1 group-hover:text-black/80 transition-colors">{svc.desc}</p>
                         </Link>

@@ -127,7 +127,7 @@ export default async function HomePage() {
           </h1>
           <Link
             href="/book"
-            className="inline-block border border-white/80 text-white px-7 py-3 text-base md:text-lg font-semibold tracking-wide hover:bg-white/10 transition"
+            className="inline-block border border-white/80 text-white px-7 py-3 text-base md:text-lg font-semibold tracking-wide hover:bg-white/10 hover:border-white transition-all hover:shadow-lg hover:scale-105"
           >
             BOOK NOW
           </Link>

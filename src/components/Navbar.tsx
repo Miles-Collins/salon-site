@@ -92,9 +92,11 @@ export default function Navbar() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`group px-0 py-2 text-sm font-medium uppercase tracking-wide text-white link-underline ${active ? "after:scale-x-100" : ""}`}
+                      className={`group relative px-0 py-2 text-sm font-medium uppercase tracking-wide text-white transition ${active ? "text-brand-accent" : "text-white"}`}
                     >
                       {item.label}
+                      {/* Animated bottom line */}
+                      <span className={`absolute bottom-0 left-0 right-0 h-0.5 bg-brand-accent transition-all duration-300 ${active ? "w-full" : "w-0 group-hover:w-full"}`}></span>
                     </Link>
                   );
                 })}
