@@ -80,8 +80,24 @@ export default function ChatSettingsManager() {
 
       if (response.ok) {
         const data = await response.json();
-        setSettings({ ...settings, avatar_url: data.url });
+        const updatedSettings = { ...settings, avatar_url: data.url };
+        setSettings(updatedSettings);
         setMessage("Avatar uploaded successfully!");
+        
+        // Auto-save to database
+        try {
+          const saveResponse = await fetch("/api/owner/chat-settings/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedSettings),
+          });
+          if (!saveResponse.ok) {
+            setMessage("Avatar uploaded but failed to save. Please click 'Save Changes'.");
+          }
+        } catch (error) {
+          setMessage("Avatar uploaded but failed to save. Please click 'Save Changes'.");
+          console.error("Auto-save error:", error);
+        }
       } else {
         const error = await response.json();
         setMessage(`Failed to upload avatar: ${error.error || 'Unknown error'}`);
@@ -134,6 +150,8 @@ export default function ChatSettingsManager() {
               onChange={handleAvatarUpload}
               disabled={uploadingAvatar}
               className="text-sm"
+              aria-label="Upload avatar image"
+              title="Upload avatar image"
             />
             {uploadingAvatar && (
               <p className="text-xs text-gray-500 mt-1">Uploading...</p>
