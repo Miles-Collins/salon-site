@@ -200,9 +200,9 @@ export default async function HomePage() {
         </div>
   <div className="relative z-10 text-center w-full px-4 md:px-4 flex-col items-center justify-center h-full hidden md:flex">
           {/* Text only - no logo on tablet/desktop */}
-          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-serif font-semibold leading-tight mb-6 md:mb-8">
-            <span className="block text-white font-light tracking-wide drop-shadow-lg">{heroTitle}</span>
-            <span className="block text-electric-teal drop-shadow-lg">{heroSubtitle}</span>
+          <h1 className="text-6xl xs:text-7xl sm:text-8xl md:text-9xl font-serif font-black leading-none mb-6 md:mb-8">
+            <span className="block text-white font-light tracking-wider drop-shadow-2xl text-outline-white">{heroTitle}</span>
+            <span className="block text-cheetah drop-shadow-2xl">{heroSubtitle}</span>
           </h1>
           <Link
             href="/book"
@@ -291,6 +291,12 @@ export default async function HomePage() {
           </div>
           
           <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <BeforeAfterSlider
+              beforeImage="/photo_1_before"
+              afterImage="/photo_1_after"
+              beforeAlt="Before hair transformation"
+              afterAlt="After hair transformation"
+            />
             <BeforeAfterSlider
               beforeImage="/gallery/2025-10-09.webp"
               afterImage="/gallery/2025-10-12.webp"
