@@ -2,11 +2,55 @@
 		cursor: url('/leopard-cursor.png') 16 16, pointer;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Typography system - Rebellious & Modern */
+@layer base {
+  body {
+    @apply font-sans text-base text-gray-900 bg-white;
+    font-size: 16px;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold;
+  }
+  
+  h1 {
+    @apply text-5xl md:text-6xl font-black;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -1px;
+  }
+  
+  h2 {
+    @apply text-4xl md:text-5xl font-black;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.5px;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl font-bold;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  /* Elegant serif for quotes and special sections */
+  .quote, .testimonial-quote {
+    @apply font-serif text-xl md:text-2xl italic;
+    font-family: 'Playfair Display', serif;
+  }
+  
+  /* Ensure minimum body text size */
+  p, a, li, span {
+    font-size: 16px;
+  }
+  
+  small {
+    font-size: 14px;
+  }
+}
 
 /* Announcement marquee animation */
 @keyframes announcement-marquee {
@@ -105,6 +149,49 @@
 	border-color: rgba(0, 0, 0, 0.2);
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 	transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Rebellious Electric CTA Buttons */
+.btn-electric {
+	@apply font-semibold px-6 py-3 md:px-8 md:py-4 rounded-lg transition-all duration-300;
+	background: linear-gradient(135deg, #FF6B35 0%, #FF1493 100%);
+	color: white;
+	box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.btn-electric:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 28px rgba(255, 107, 53, 0.5), 0 0 20px rgba(255, 107, 53, 0.4);
+	background: linear-gradient(135deg, #FF6B35 0%, #FF1493 100%);
+	filter: brightness(1.1);
+}
+
+/* Teal Electric Accent */
+.btn-teal {
+	@apply font-semibold px-6 py-3 md:px-8 md:py-4 rounded-lg transition-all duration-300;
+	background: linear-gradient(135deg, #00D9FF 0%, #00E5FF 100%);
+	color: #0F0F0F;
+	box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+}
+
+.btn-teal:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 28px rgba(0, 217, 255, 0.5), 0 0 20px rgba(0, 217, 255, 0.4);
+	filter: brightness(1.1);
+}
+
+/* Outline with electric color on hover */
+.btn-outline-electric {
+	@apply font-semibold px-6 py-3 md:px-8 md:py-4 rounded-lg border-2 border-rebel-charcoal text-rebel-charcoal transition-all duration-300;
+	background: transparent;
+}
+
+.btn-outline-electric:hover {
+	transform: translateY(-4px);
+	border-color: #FF6B35;
+	background: rgba(255, 107, 53, 0.05);
+	color: #FF6B35;
+	box-shadow: 0 8px 20px rgba(255, 107, 53, 0.2);
 }
 
 /* Card hover effects */
@@ -259,13 +346,20 @@ html { scroll-behavior: smooth; }
 :root { --bg: #ffffff; --fg: #0b0b0b; }
 html, body { background: var(--bg); color: var(--fg); }
 .container { @apply mx-auto max-w-6xl px-4; }
-.btn { @apply inline-flex items-center justify-center rounded-2xl bg-brand text-white px-5 py-3 font-medium shadow-soft transition hover:bg-black/90; }
-.btn-accent { @apply inline-flex items-center justify-center rounded-2xl bg-brand-accent text-black px-5 py-3 font-semibold shadow-soft hover:opacity-90; }
-.btn-outline { @apply inline-flex items-center justify-center rounded-2xl border border-black/10 px-5 py-3 font-medium hover:bg-black/5; }
+
+/* Primary button - Rebellious charcoal */
+.btn { @apply inline-flex items-center justify-center rounded-2xl bg-rebel-charcoal text-white px-5 py-3 font-medium shadow-soft transition hover:bg-rebel-dark; }
+
+/* Accent button - Electric orange */
+.btn-accent { @apply inline-flex items-center justify-center rounded-2xl bg-electric-orange text-white px-5 py-3 font-semibold shadow-soft hover:brightness-110; }
+
+/* Outline button */
+.btn-outline { @apply inline-flex items-center justify-center rounded-2xl border-2 border-rebel-charcoal px-5 py-3 font-medium text-rebel-charcoal hover:bg-rebel-charcoal hover:text-white transition; }
+
 .card { 
   @apply rounded-2xl bg-white shadow-soft ring-1 ring-black/5; 
-  border-top: 2px solid #d4af37;
-  border-bottom: 2px solid #d4af37;
+  border-top: 2px solid #C9A961;
+  border-bottom: 2px solid #C9A961;
 }
 .section { @apply px-4 sm:px-6 py-20 md:py-24 lg:py-32; }
 .h1 { @apply text-4xl lg:text-5xl font-bold tracking-tight font-serif; }

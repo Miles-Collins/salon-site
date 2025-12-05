@@ -77,7 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased flex flex-col">
+      <body className="min-h-screen antialiased flex flex-col bg-white text-rebel-charcoal">
         <GoogleAnalytics />
         <FacebookPixel />
         {publishableKey ? (

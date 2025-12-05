@@ -5,23 +5,49 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: { DEFAULT: "#1F2937", accent: "#E879F9" }, // charcoal + lilac-pink
-        gold: {
-          light: "#F0E6D2",
-          DEFAULT: "#C9A961", // Warm champagne gold (was #d4af37)
-          dark: "#8B7355", // Deep bronze
+        // Rebellious base palette
+        rebel: {
+          dark: "#0F0F0F", // Deep charcoal/black
+          charcoal: "#1A1A1A", // Dark charcoal
+          base: "#2D2D2D", // Medium charcoal
         },
+        // Electric accents for CTAs and highlights
+        electric: {
+          teal: "#00D9FF", // Bright electric teal
+          cyan: "#00E5FF", // Vibrant cyan
+          orange: "#FF6B35", // Fiery orange
+          pink: "#FF1493", // Deep pink
+        },
+        // Warm neutrals for balance
+        warm: {
+          gold: "#C9A961", // Champagne gold accent
+          cream: "#F5F1EB", // Warm cream
+          sand: "#E8DCC8", // Warm sand
+        },
+        // Legacy jewel tones for accent elements
         jewel: {
-          emerald: "#2D7D5E", // Deep emerald green
-          sapphire: "#1E3A8A", // Rich sapphire blue
-          burgundy: "#6B1B47", // Deep burgundy wine
-          amethyst: "#7C3AED", // Rich purple
+          emerald: "#2D7D5E",
+          sapphire: "#1E3A8A",
+          burgundy: "#6B1B47",
+          amethyst: "#7C3AED",
         },
       },
       boxShadow: { soft: "0 12px 32px rgba(0,0,0,.08)" },
       fontFamily: { 
-        sans: ["ui-sans-serif", "system-ui", "Segoe UI", "Inter", "sans-serif"],
-        serif: ["Playfair Display", "Georgia", "serif"]
+        sans: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ["Playfair Display", "Georgia", "serif"],
+        display: ["Montserrat", "sans-serif"],
+      },
+      fontSize: {
+        // Ensure minimum 16px for body text
+        base: "16px",
+        sm: "14px",
+        lg: "18px",
+        xl: "20px",
+        "2xl": "24px",
+        "3xl": "32px",
+        "4xl": "40px",
+        "5xl": "48px",
       }
     },
   },
