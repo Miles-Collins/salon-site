@@ -9,8 +9,18 @@ import FAQManager from "./FAQManager";
 import ServiceDetailsManager from "./ServiceDetailsManager";
 import ChatSettingsManager from "./ChatSettingsManager";
 import GalleryManager from "./GalleryManager";
+import TransformationsManager from "./TransformationsManager";
 
-type TabId = "welcome" | "analytics" | "site-content" | "services" | "testimonials" | "faqs" | "chat" | "gallery";
+type TabId =
+  | "welcome"
+  | "analytics"
+  | "site-content"
+  | "services"
+  | "testimonials"
+  | "faqs"
+  | "chat"
+  | "gallery"
+  | "transformations";
 
 interface Tab {
   id: TabId;
@@ -27,10 +37,12 @@ const tabs: Tab[] = [
   { id: "faqs", label: "FAQs", icon: "❓" },
   { id: "chat", label: "Chat Widget", icon: "💭" },
   { id: "gallery", label: "Gallery", icon: "🖼️" },
+  { id: "transformations", label: "Transformations", icon: "⚡" },
 ];
 
 export default function DashboardTabs() {
   const [activeTab, setActiveTab] = useState<TabId>("welcome");
+  const [mediaOpen, setMediaOpen] = useState<boolean>(false);
   const { user } = useUser();
 
   return (
@@ -64,22 +76,69 @@ export default function DashboardTabs() {
 
         {/* Tab Navigation */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {tabs.map((tab) => (
+          {tabs
+            .filter((t) => t.id !== "gallery" && t.id !== "transformations")
+            .map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                  activeTab === tab.id
+                    ? "bg-slate-700 text-white shadow-md"
+                    : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                }`}
+              >
+                <span className="text-xl" role="img" aria-label={tab.label}>
+                  {tab.icon}
+                </span>
+                <span className="font-medium">{tab.label}</span>
+              </button>
+            ))}
+
+          <div className="space-y-1">
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
-                activeTab === tab.id
+              onClick={() => setMediaOpen((v) => !v)}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all text-sm ${
+                activeTab === "gallery" || activeTab === "transformations"
                   ? "bg-slate-700 text-white shadow-md"
                   : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
               }`}
             >
-              <span className="text-xl" role="img" aria-label={tab.label}>
-                {tab.icon}
+              <span className="flex items-center gap-2">
+                <span className="text-xl" role="img" aria-label="Media">
+                  🖼️
+                </span>
+                <span className="font-medium">Media</span>
               </span>
-              <span className="font-medium">{tab.label}</span>
+              <span className="text-xs">{mediaOpen ? "▲" : "▼"}</span>
             </button>
-          ))}
+            {mediaOpen && (
+              <div className="pl-8 space-y-1">
+                <button
+                  onClick={() => setActiveTab("gallery")}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                    activeTab === "gallery"
+                      ? "bg-slate-700 text-white shadow-md"
+                      : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                  }`}
+                >
+                  <span className="text-lg">📸</span>
+                  <span className="font-medium">Gallery</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("transformations")}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                    activeTab === "transformations"
+                      ? "bg-slate-700 text-white shadow-md"
+                      : "text-slate-300 hover:bg-slate-700/50 hover:text-white"
+                  }`}
+                >
+                  <span className="text-lg">⚡</span>
+                  <span className="font-medium">Transformations</span>
+                </button>
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Footer */}
@@ -106,7 +165,10 @@ export default function DashboardTabs() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                {tabs.slice(1).map((tab) => (
+                {tabs
+                  .filter((t) => t.id !== "gallery" && t.id !== "transformations")
+                  .slice(1)
+                  .map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
@@ -143,21 +205,25 @@ export default function DashboardTabs() {
                     <span className="text-sm font-medium">View Analytics</span>
                   </button>
                   <button
-                    onClick={() => setActiveTab("gallery")}
+                    onClick={() => {
+                      setMediaOpen(true);
+                      setActiveTab("gallery");
+                    }}
                     className="flex items-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <span>📸</span>
                     <span className="text-sm font-medium">Upload Photos</span>
                   </button>
-                  <a
-                    href="/transformations"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => {
+                      setMediaOpen(true);
+                      setActiveTab("transformations");
+                    }}
                     className="flex items-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <span>⚡</span>
-                    <span className="text-sm font-medium">View Transformations</span>
-                  </a>
+                    <span className="text-sm font-medium">Manage Transformations</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -239,6 +305,16 @@ export default function DashboardTabs() {
               <GalleryManager />
             </div>
           )}
+
+          {activeTab === "transformations" && (
+            <div>
+              <div className="mb-6">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Transformations</h1>
+                <p className="text-gray-600 mt-1">Upload and manage before/after transformation photos</p>
+              </div>
+              <TransformationsManager />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -255,6 +331,7 @@ function getTabDescription(tabId: TabId): string {
     faqs: "Common questions",
     chat: "Customize chat widget",
     gallery: "Photo management",
+    transformations: "Before/after management",
   };
   return descriptions[tabId];
 }
