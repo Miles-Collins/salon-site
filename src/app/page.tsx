@@ -38,6 +38,12 @@ type ContentMap = {
   transformation_sliders?: TransformationSlide[];
 };
 
+type GalleryBeforeAfter = {
+  name: string;
+  before_image?: string | null;
+  display_order?: number | null;
+};
+
 async function getContent(): Promise<ContentMap> {
   // If env vars are missing (e.g., during build without Supabase), return defaults
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -52,6 +58,39 @@ async function getContent(): Promise<ContentMap> {
   const map: Record<string, any> = {};
   (data || []).forEach((row: any) => (map[row.key] = row.value));
   return map as ContentMap;
+}
+
+const galleryUrlForKey = (key: string) =>
+  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery/${key}`;
+
+async function getHomepageSlidersFromGallery(): Promise<TransformationSlide[]> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return [];
+  }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data, error } = await supabase
+    .from("gallery_images")
+    .select("name, before_image, display_order")
+    .eq("is_before_after", true)
+    .order("display_order", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .limit(2);
+
+  if (error || !data?.length) return [];
+
+  return data
+    .filter((row: GalleryBeforeAfter) => !!row.before_image)
+    .map((row: GalleryBeforeAfter) => ({
+      beforeImage: galleryUrlForKey(row.before_image!),
+      afterImage: galleryUrlForKey(row.name),
+      beforeAlt: "Before hair transformation",
+      afterAlt: "After hair transformation",
+    }));
 }
 
 export default async function HomePage() {
@@ -73,7 +112,8 @@ export default async function HomePage() {
       afterAlt: "After vivid hair color",
     },
   ];
-  const transformationSliders = (content.transformation_sliders || defaultSliders).slice(0, 2);
+  const gallerySliders = await getHomepageSlidersFromGallery();
+  const transformationSliders = (gallerySliders.length ? gallerySliders : content.transformation_sliders || defaultSliders).slice(0, 2);
   return (
     <>
       {/* Enhanced Schema.org LocalBusiness with additional properties */}
