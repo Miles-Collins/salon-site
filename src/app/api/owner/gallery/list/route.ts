@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isOwner } from "@/lib/authz";
 
-const bucket = "gallery";
+const GALLERY_BUCKET = "gallery";
+const TRANSFORMATIONS_BUCKET = "gallery-transformations";
 
 export const dynamic = 'force-dynamic';
 
@@ -12,21 +13,34 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  const { data, error } = await supabase.storage.from(bucket).list(undefined, {
-    limit: 1000,
-    sortBy: { column: "created_at", order: "desc" },
-  });
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!serviceKey) {
+    return NextResponse.json({ error: "Supabase service role key not configured" }, { status: 500 });
   }
 
-  const publicBase = supabase.storage.from(bucket).getPublicUrl("").data.publicUrl;
+  // Use service role to bypass RLS for listing owner gallery
+  const supabase = createClient(supabaseUrl, serviceKey);
+
+  // List both buckets in parallel
+  const [galleryRes, transformationsRes] = await Promise.all([
+    supabase.storage.from(GALLERY_BUCKET).list(undefined, {
+      limit: 1000,
+      sortBy: { column: "created_at", order: "desc" },
+    }),
+    supabase.storage.from(TRANSFORMATIONS_BUCKET).list(undefined, {
+      limit: 1000,
+      sortBy: { column: "created_at", order: "desc" },
+    }),
+  ]);
+
+  if (galleryRes.error && transformationsRes.error) {
+    return NextResponse.json({ error: "Failed to list gallery" }, { status: 500 });
+  }
+
+  const galleryPublicBase = supabase.storage.from(GALLERY_BUCKET).getPublicUrl("").data.publicUrl;
+  const transformationsPublicBase = supabase.storage.from(TRANSFORMATIONS_BUCKET).getPublicUrl("").data.publicUrl;
 
   // Fetch metadata rows
   const { data: metaRows } = await supabase
@@ -34,9 +48,13 @@ export async function GET() {
     .select("name, caption, tags, display_order, created_at, is_before_after, before_image");
   const metaMap = new Map((metaRows || []).map((m) => [m.name, m]));
 
-  const items = (data || [])
-    .map((f) => {
+  const items = [
+    ...(galleryRes.data || []).map((f) => ({ ...f, bucket: GALLERY_BUCKET })),
+    ...(transformationsRes.data || []).map((f) => ({ ...f, bucket: TRANSFORMATIONS_BUCKET })),
+  ]
+    .map((f: any) => {
       const meta = metaMap.get(f.name);
+      const publicBase = f.bucket === TRANSFORMATIONS_BUCKET ? transformationsPublicBase : galleryPublicBase;
       return {
         name: f.name,
         created_at: (meta?.created_at as any) || (f as any).created_at,

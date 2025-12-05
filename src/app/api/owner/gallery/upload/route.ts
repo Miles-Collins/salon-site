@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isOwner } from "@/lib/authz";
 
-const bucket = "gallery";
+const GALLERY_BUCKET = "gallery";
+const TRANSFORMATIONS_BUCKET = "gallery-transformations";
 
 export const dynamic = 'force-dynamic';
 
@@ -37,13 +38,18 @@ export async function POST(request: Request) {
   const tagsRaw = (formData.get("tags") as string | null) || ""; // comma-separated
   const displayOrderStr = (formData.get("display_order") as string | null) || null;
   const displayOrder = displayOrderStr !== null ? parseInt(displayOrderStr, 10) : null;
+  const isBeforeAfter = formData.get("is_before_after") === "true";
+  const beforeImage = (formData.get("before_image") as string | null) || null;
   const tags = tagsRaw
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
 
+  // Route to appropriate bucket based on image type
+  const targetBucket = isBeforeAfter ? TRANSFORMATIONS_BUCKET : GALLERY_BUCKET;
+
   const arrayBuffer = await file.arrayBuffer();
-  const { error } = await supabase.storage.from(bucket).upload(name, arrayBuffer, {
+  const { error } = await supabase.storage.from(targetBucket).upload(name, arrayBuffer, {
     contentType: file.type || "application/octet-stream",
     upsert: false,
   });
@@ -58,8 +64,10 @@ export async function POST(request: Request) {
     caption,
     tags,
     display_order: Number.isFinite(displayOrder as any) ? displayOrder : null,
+    is_before_after: isBeforeAfter,
+    before_image: beforeImage,
   });
 
-  const publicUrl = supabase.storage.from(bucket).getPublicUrl(name).data.publicUrl;
-  return NextResponse.json({ name, url: publicUrl, caption, tags, display_order: displayOrder });
+  const publicUrl = supabase.storage.from(targetBucket).getPublicUrl(name).data.publicUrl;
+  return NextResponse.json({ name, url: publicUrl, caption, tags, display_order: displayOrder, is_before_after: isBeforeAfter, before_image: beforeImage });
 }
