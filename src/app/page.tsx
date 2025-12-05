@@ -25,7 +25,20 @@ export const metadata = {
   },
 };
 
-async function getContent() {
+type TransformationSlide = {
+  beforeImage: string;
+  afterImage: string;
+  beforeAlt?: string;
+  afterAlt?: string;
+};
+
+type ContentMap = {
+  hero?: { title?: string; subtitle?: string };
+  announcement?: { enabled?: boolean; text?: string };
+  transformation_sliders?: TransformationSlide[];
+};
+
+async function getContent(): Promise<ContentMap> {
   // If env vars are missing (e.g., during build without Supabase), return defaults
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return {};
@@ -38,7 +51,7 @@ async function getContent() {
   const { data } = await supabase.from("site_content").select("key, value");
   const map: Record<string, any> = {};
   (data || []).forEach((row: any) => (map[row.key] = row.value));
-  return map as { hero?: { title?: string; subtitle?: string }; announcement?: { enabled?: boolean; text?: string } };
+  return map as ContentMap;
 }
 
 export default async function HomePage() {
@@ -46,6 +59,21 @@ export default async function HomePage() {
   const heroTitle = content.hero?.title || "COLOR REBEL BY";
   const heroSubtitle = content.hero?.subtitle || "PORSCHA";
   const announcement = content.announcement;
+  const defaultSliders: TransformationSlide[] = [
+    {
+      beforeImage: "/photo_1_before",
+      afterImage: "/photo_1_after",
+      beforeAlt: "Before hair transformation",
+      afterAlt: "After hair transformation",
+    },
+    {
+      beforeImage: "/gallery/2025-10-09.webp",
+      afterImage: "/gallery/2025-10-12.webp",
+      beforeAlt: "Before hair color transformation",
+      afterAlt: "After vivid hair color",
+    },
+  ];
+  const transformationSliders = (content.transformation_sliders || defaultSliders).slice(0, 2);
   return (
     <>
       {/* Enhanced Schema.org LocalBusiness with additional properties */}
@@ -291,24 +319,15 @@ export default async function HomePage() {
           </div>
           
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <BeforeAfterSlider
-              beforeImage="/photo_1_before"
-              afterImage="/photo_1_after"
-              beforeAlt="Before hair transformation"
-              afterAlt="After hair transformation"
-            />
-            <BeforeAfterSlider
-              beforeImage="/gallery/2025-10-09.webp"
-              afterImage="/gallery/2025-10-12.webp"
-              beforeAlt="Before hair color transformation"
-              afterAlt="After vivid hair color"
-            />
-            <BeforeAfterSlider
-              beforeImage="/gallery/2025-10-13.webp"
-              afterImage="/gallery/2025-10-133.webp"
-              beforeAlt="Before hair styling"
-              afterAlt="After precision cut and style"
-            />
+            {transformationSliders.map((slide, idx) => (
+              <BeforeAfterSlider
+                key={`${slide.beforeImage}-${idx}`}
+                beforeImage={slide.beforeImage}
+                afterImage={slide.afterImage}
+                beforeAlt={slide.beforeAlt || "Before hair transformation"}
+                afterAlt={slide.afterAlt || "After hair transformation"}
+              />
+            ))}
           </div>
           
           <div className="text-center">
