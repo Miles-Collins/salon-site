@@ -200,7 +200,7 @@ export default async function HomePage() {
         </div>
   <div className="relative z-10 text-center w-full px-4 md:px-4 flex-col items-center justify-center h-full hidden md:flex">
           {/* Text only - no logo on tablet/desktop */}
-          <h1 className="text-6xl xs:text-7xl sm:text-8xl md:text-9xl font-serif font-black leading-none mb-6 md:mb-8">
+          <h1 className="text-8xl md:text-9xl font-serif font-black leading-none mb-6 md:mb-8">
             <span className="block text-white font-light tracking-wider drop-shadow-2xl text-outline-white">{heroTitle}</span>
             <span className="block text-cheetah drop-shadow-2xl">{heroSubtitle}</span>
           </h1>
