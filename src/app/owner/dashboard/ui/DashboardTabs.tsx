@@ -149,6 +149,15 @@ export default function DashboardTabs() {
                     <span>📸</span>
                     <span className="text-sm font-medium">Upload Photos</span>
                   </button>
+                  <a
+                    href="/transformations"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <span>⚡</span>
+                    <span className="text-sm font-medium">View Transformations</span>
+                  </a>
                 </div>
               </div>
             </div>

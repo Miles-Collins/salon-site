@@ -24,6 +24,8 @@ type GalleryImage = {
   tags?: string[];
   is_before_after?: boolean;
   before_image?: string;
+    url?: string;
+    before_url?: string;
 };
 
 async function getTransformations() {
@@ -44,7 +46,15 @@ async function getTransformations() {
     .order("display_order", { ascending: true })
     .order("created_at", { ascending: false });
 
-  return (data || []) as GalleryImage[];
+  // Construct public URLs for transformations bucket
+  const transformationsPublicBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery-transformations`;
+  const galleryPublicBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery`;
+
+  return (data || []).map((img: any) => ({
+    ...img,
+    url: `${transformationsPublicBase}/${encodeURIComponent(img.name)}`,
+    before_url: img.before_image ? `${galleryPublicBase}/${encodeURIComponent(img.before_image)}` : null,
+  })) as GalleryImage[];
 }
 
 export default async function TransformationsPage() {
@@ -97,10 +107,8 @@ export default async function TransformationsPage() {
           ) : (
             <div className="grid gap-12 md:gap-16">
               {transformations.map((transformation, idx) => {
-                const beforeUrl = transformation.before_image
-                  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery/${transformation.before_image}`
-                  : null;
-                const afterUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery/${transformation.name}`;
+                const beforeUrl = transformation.before_url;
+                const afterUrl = transformation.url || '';
 
                 return (
                   <div key={transformation.name} className="space-y-6">
