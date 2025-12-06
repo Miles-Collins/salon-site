@@ -11,6 +11,7 @@ type Item = {
   caption?: string | null;
   display_order?: number | null;
   before_image?: string | null;
+  is_before_after?: boolean;
 };
 
 export default function TransformationsManager() {
@@ -31,18 +32,23 @@ export default function TransformationsManager() {
         throw new Error(err.error || `HTTP ${res.status}`);
       }
       const json = await res.json();
-      const allGalleryItems = (json.items || []).map((i: any) => ({
-        name: i.name,
-        url: i.url,
-        caption: i.caption || null,
-        display_order: i.display_order ?? null,
-        before_image: i.before_image || null,
-      })) as Item[];
+      // Filter to only transformation-gallery items (is_before_after = true)
+      const allTransformationItems = (json.items || [])
+        .filter((i: any) => i.is_before_after === true)
+        .map((i: any) => ({
+          name: i.name,
+          url: i.url,
+          caption: i.caption || null,
+          display_order: i.display_order ?? null,
+          before_image: i.before_image || null,
+          is_before_after: i.is_before_after,
+        })) as Item[];
       
-      const transformedItems = allGalleryItems.filter(i => i.before_image);
-      
-      setAllItems(allGalleryItems);
-      setTransformations(transformedItems);
+      // All transformation items are available for the left sidebar
+      setAllItems(allTransformationItems);
+      // Pairs are items that have both before_image and after (current item)
+      const pairs = allTransformationItems.filter(i => i.before_image);
+      setTransformations(pairs);
     } catch (e: any) {
       setError(e?.message || "Failed to load");
       toast.error("Failed to load transformations");
@@ -63,7 +69,6 @@ export default function TransformationsManager() {
     form.append("file", file);
     form.append("is_before_after", "true");
     
-    setLoading(true);
     setError(null);
     
     try {
@@ -72,14 +77,15 @@ export default function TransformationsManager() {
         body: form,
       });
       if (!res.ok) throw new Error("Upload failed");
+      
+      // Wait a moment for the database to update, then refresh
+      await new Promise(resolve => setTimeout(resolve, 500));
       await refresh();
       toast.success("Transformation uploaded");
       setDragOverDropZone(false);
     } catch (e: any) {
       setError(e?.message || "Upload failed");
       toast.error("Upload failed");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -89,8 +95,6 @@ export default function TransformationsManager() {
       return;
     }
 
-    setLoading(true);
-    setError(null);
     try {
       const res = await fetch("/api/owner/gallery/update", {
         method: "POST",
@@ -104,13 +108,14 @@ export default function TransformationsManager() {
         }),
       });
       if (!res.ok) throw new Error("Save failed");
+      
+      // Wait a moment for the database to update, then refresh
+      await new Promise(resolve => setTimeout(resolve, 500));
       await refresh();
       toast.success("Transformation pair saved");
     } catch (e: any) {
       setError(e?.message || "Save failed");
       toast.error("Save failed");
-    } finally {
-      setLoading(false);
     }
   };
 
