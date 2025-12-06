@@ -230,7 +230,6 @@ export default function DashboardTabs() {
 }
 
 function renderTabContent(activeTab: TabId, user: any, setActiveTab: (tab: TabId) => void) {
-function renderTabContent(activeTab: TabId, user: any, setActiveTab: (tab: TabId) => void) {
   switch (activeTab) {
     case "welcome":
       return (
@@ -460,3 +459,4 @@ function renderTabContent(activeTab: TabId, user: any, setActiveTab: (tab: TabId
       return null;
   }
 }
+
