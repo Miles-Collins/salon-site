@@ -4,6 +4,7 @@ import { isOwner } from "@/lib/authz";
 
 const GALLERY_BUCKET = "gallery";
 const TRANSFORMATIONS_BUCKET = "gallery-transformations";
+const SERVICES_BUCKET = "gallery-services";
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
   const displayOrderStr = (formData.get("display_order") as string | null) || null;
   const displayOrder = displayOrderStr !== null ? parseInt(displayOrderStr, 10) : null;
   const isBeforeAfter = formData.get("is_before_after") === "true";
+  const isService = formData.get("is_service") === "true";
   const beforeImage = (formData.get("before_image") as string | null) || null;
   const tags = tagsRaw
     .split(",")
@@ -46,7 +48,9 @@ export async function POST(request: Request) {
     .filter(Boolean);
 
   // Route to appropriate bucket based on image type
-  const targetBucket = isBeforeAfter ? TRANSFORMATIONS_BUCKET : GALLERY_BUCKET;
+  let targetBucket = GALLERY_BUCKET;
+  if (isBeforeAfter) targetBucket = TRANSFORMATIONS_BUCKET;
+  if (isService) targetBucket = SERVICES_BUCKET;
 
   const arrayBuffer = await file.arrayBuffer();
   const { error } = await supabase.storage.from(targetBucket).upload(name, arrayBuffer, {
@@ -66,8 +70,9 @@ export async function POST(request: Request) {
     display_order: Number.isFinite(displayOrder as any) ? displayOrder : null,
     is_before_after: isBeforeAfter,
     before_image: beforeImage,
+    bucket: targetBucket,
   });
 
   const publicUrl = supabase.storage.from(targetBucket).getPublicUrl(name).data.publicUrl;
-  return NextResponse.json({ name, url: publicUrl, caption, tags, display_order: displayOrder, is_before_after: isBeforeAfter, before_image: beforeImage });
+  return NextResponse.json({ name, url: publicUrl, caption, tags, display_order: displayOrder, is_before_after: isBeforeAfter, is_service: isService, before_image: beforeImage, bucket: targetBucket });
 }

@@ -68,13 +68,6 @@ export default function DashboardSidebar() {
             );
           })}
         </nav>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-slate-700">
-          <p className="text-xs text-slate-500 text-center">
-            © 2025 Color Rebel
-          </p>
-        </div>
       </aside>
 
       {/* Mobile Spacer (sidebar is hidden on mobile, content uses navbar mobile menu) */}

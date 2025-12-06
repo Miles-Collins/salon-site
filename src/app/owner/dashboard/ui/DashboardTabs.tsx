@@ -166,13 +166,6 @@ export default function DashboardTabs() {
             </div>
           </div>
         </nav>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-100">
-          <p className="text-xs text-gray-500 text-center">
-            © 2025 Color Rebel
-          </p>
-        </div>
       </aside>
 
       {/* Mobile Header */}

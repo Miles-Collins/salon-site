@@ -26,6 +26,7 @@ export async function POST(request: Request) {
     display_order?: number | null;
     is_before_after?: boolean;
     before_image?: string | null;
+    bucket?: string;
   } | null;
 
   if (!body?.name) {
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
     display_order: typeof body.display_order === "number" ? body.display_order : null,
     is_before_after: body.is_before_after ?? false,
     before_image: body.before_image ?? null,
+    bucket: body.bucket ?? null,
   });
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

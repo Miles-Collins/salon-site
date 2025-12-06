@@ -4,6 +4,7 @@ import { isOwner } from "@/lib/authz";
 
 const GALLERY_BUCKET = "gallery";
 const TRANSFORMATIONS_BUCKET = "gallery-transformations";
+const SERVICES_BUCKET = "gallery-services";
 
 export const dynamic = 'force-dynamic';
 
@@ -23,8 +24,8 @@ export async function GET() {
   // Use service role to bypass RLS for listing owner gallery
   const supabase = createClient(supabaseUrl, serviceKey);
 
-  // List both buckets in parallel
-  const [galleryRes, transformationsRes] = await Promise.all([
+  // List all three buckets in parallel
+  const [galleryRes, transformationsRes, servicesRes] = await Promise.all([
     supabase.storage.from(GALLERY_BUCKET).list(undefined, {
       limit: 1000,
       sortBy: { column: "created_at", order: "desc" },
@@ -33,28 +34,38 @@ export async function GET() {
       limit: 1000,
       sortBy: { column: "created_at", order: "desc" },
     }),
+    supabase.storage.from(SERVICES_BUCKET).list(undefined, {
+      limit: 1000,
+      sortBy: { column: "created_at", order: "desc" },
+    }),
   ]);
 
-  if (galleryRes.error && transformationsRes.error) {
+  if (galleryRes.error && transformationsRes.error && servicesRes.error) {
     return NextResponse.json({ error: "Failed to list gallery" }, { status: 500 });
   }
 
   const galleryPublicBase = supabase.storage.from(GALLERY_BUCKET).getPublicUrl("").data.publicUrl;
   const transformationsPublicBase = supabase.storage.from(TRANSFORMATIONS_BUCKET).getPublicUrl("").data.publicUrl;
+  const servicesPublicBase = supabase.storage.from(SERVICES_BUCKET).getPublicUrl("").data.publicUrl;
 
   // Fetch metadata rows
   const { data: metaRows } = await supabase
     .from("gallery_images")
-    .select("name, caption, tags, display_order, created_at, is_before_after, before_image");
+    .select("name, caption, tags, display_order, created_at, is_before_after, before_image, bucket");
   const metaMap = new Map((metaRows || []).map((m) => [m.name, m]));
 
   const items = [
     ...(galleryRes.data || []).map((f) => ({ ...f, bucket: GALLERY_BUCKET })),
     ...(transformationsRes.data || []).map((f) => ({ ...f, bucket: TRANSFORMATIONS_BUCKET })),
+    ...(servicesRes.data || []).map((f) => ({ ...f, bucket: SERVICES_BUCKET })),
   ]
     .map((f: any) => {
       const meta = metaMap.get(f.name);
-      const publicBase = f.bucket === TRANSFORMATIONS_BUCKET ? transformationsPublicBase : galleryPublicBase;
+      const bucketName = meta?.bucket || f.bucket;
+      let publicBase = galleryPublicBase;
+      if (bucketName === TRANSFORMATIONS_BUCKET) publicBase = transformationsPublicBase;
+      if (bucketName === SERVICES_BUCKET) publicBase = servicesPublicBase;
+      
       return {
         name: f.name,
         created_at: (meta?.created_at as any) || (f as any).created_at,
@@ -64,6 +75,7 @@ export async function GET() {
         display_order: meta?.display_order ?? null,
         is_before_after: meta?.is_before_after || false,
         before_image: meta?.before_image || null,
+        bucket: bucketName,
       };
     })
     .sort((a, b) => {

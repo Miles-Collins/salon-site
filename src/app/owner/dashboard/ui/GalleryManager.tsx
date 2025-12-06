@@ -11,12 +11,14 @@ type Item = {
   display_order?: number | null;
   is_before_after?: boolean;
   before_image?: string | null;
+  bucket?: string;
 };
 
 type DeleteConfirmation = {
   isOpen: boolean;
   itemName: string | null;
   itemCaption: string | null;
+  bucket?: string;
 };
 
 export default function GalleryManager() {
@@ -29,14 +31,16 @@ export default function GalleryManager() {
     isOpen: false,
     itemName: null,
     itemCaption: null,
+    bucket: undefined,
   });
   const toast = useToast();
 
-  const openDeleteConfirm = (name: string, caption: string | null) => {
+  const openDeleteConfirm = (name: string, caption: string | null, bucket?: string) => {
     setDeleteConfirm({
       isOpen: true,
       itemName: name,
       itemCaption: caption,
+      bucket: bucket,
     });
   };
 
@@ -45,12 +49,14 @@ export default function GalleryManager() {
       isOpen: false,
       itemName: null,
       itemCaption: null,
+      bucket: undefined,
     });
   };
 
   const confirmDelete = async () => {
     if (!deleteConfirm.itemName) return;
     const name = deleteConfirm.itemName;
+    const bucket = deleteConfirm.bucket || "gallery";
     closeDeleteConfirm();
     
     setLoading(true);
@@ -59,7 +65,7 @@ export default function GalleryManager() {
       const res = await fetch("/api/owner/gallery/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, bucket }),
       });
       if (!res.ok) throw new Error("Delete failed");
       await refresh();
@@ -82,7 +88,9 @@ export default function GalleryManager() {
         throw new Error(errorData.error || `HTTP ${res.status}`);
       }
       const json = await res.json();
-      setItems(json.items || []);
+      // Filter to only gallery bucket items (not transformations or services)
+      const galleryItems = (json.items || []).filter((item: Item) => !item.bucket || item.bucket === "gallery");
+      setItems(galleryItems);
     } catch (e: any) {
       console.error("Gallery load error:", e);
       setError(e?.message || "Failed to load gallery");
@@ -137,6 +145,7 @@ export default function GalleryManager() {
           display_order: typeof it.display_order === "number" ? it.display_order : null,
           is_before_after: it.is_before_after ?? false,
           before_image: it.before_image ?? null,
+          bucket: it.bucket ?? "gallery",
         }),
       });
       if (!res.ok) throw new Error("Save failed");
@@ -265,7 +274,7 @@ export default function GalleryManager() {
                     )}
                   </button>
                   <button
-                    onClick={() => openDeleteConfirm(it.name, it.caption || null)}
+                    onClick={() => openDeleteConfirm(it.name, it.caption || null, it.bucket)}
                     className="p-2 bg-red-500/90 hover:bg-red-600 rounded-lg shadow-lg transition-all"
                     title="Delete"
                   >
