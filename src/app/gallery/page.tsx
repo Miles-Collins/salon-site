@@ -32,13 +32,16 @@ export default function GalleryPage() {
         const res = await fetch("/api/owner/gallery/list");
         if (!res.ok) return; // fall back silently
         const json = await res.json();
-        const items: GItem[] = (json.items || []).map((i: any) => ({
-          src: i.url,
-          alt: i.caption || i.name,
-          caption: i.caption || null,
-          display_order: i.display_order ?? null,
-          created_at: i.created_at,
-        }));
+        // Filter to only gallery bucket images (exclude transformations and services)
+        const items: GItem[] = (json.items || [])
+          .filter((i: any) => !i.bucket || i.bucket === "gallery")
+          .map((i: any) => ({
+            src: i.url,
+            alt: i.caption || i.name,
+            caption: i.caption || null,
+            display_order: i.display_order ?? null,
+            created_at: i.created_at,
+          }));
         items.sort((a, b) => {
           const ao = a.display_order ?? Number.MAX_SAFE_INTEGER;
           const bo = b.display_order ?? Number.MAX_SAFE_INTEGER;

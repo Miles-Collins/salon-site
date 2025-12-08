@@ -18,28 +18,33 @@ type DeleteConfirmation = {
   isOpen: boolean;
   itemName: string | null;
   itemCaption: string | null;
+  itemUrl?: string | null;
   bucket?: string;
 };
 
 export default function GalleryManager() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<{ url: string; caption: string } | null>(null);
   const [dragOverDropZone, setDragOverDropZone] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmation>({
     isOpen: false,
     itemName: null,
     itemCaption: null,
+    itemUrl: null,
     bucket: undefined,
   });
   const toast = useToast();
 
-  const openDeleteConfirm = (name: string, caption: string | null, bucket?: string) => {
+  const openDeleteConfirm = (name: string, caption: string | null, url: string, bucket?: string) => {
     setDeleteConfirm({
       isOpen: true,
       itemName: name,
       itemCaption: caption,
+      itemUrl: url,
       bucket: bucket,
     });
   };
@@ -49,6 +54,7 @@ export default function GalleryManager() {
       isOpen: false,
       itemName: null,
       itemCaption: null,
+      itemUrl: null,
       bucket: undefined,
     });
   };
@@ -108,10 +114,23 @@ export default function GalleryManager() {
     if (!files || files.length === 0) return;
     
     const file = files[0];
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please select an image file");
+      return;
+    }
+    
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image must be smaller than 10MB");
+      return;
+    }
+    
     const form = new FormData();
     form.append("file", file);
     
-    setLoading(true);
+    setUploading(true);
     setError(null);
     
     try {
@@ -119,15 +138,18 @@ export default function GalleryManager() {
         method: "POST",
         body: form,
       });
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Upload failed");
+      }
       await refresh();
-      toast.success("Image uploaded successfully");
+      toast.success(`${file.name} uploaded successfully`);
       setDragOverDropZone(false);
     } catch (e: any) {
       setError(e?.message || "Upload failed");
-      toast.error("Upload failed");
+      toast.error(e?.message || "Upload failed");
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -164,214 +186,365 @@ export default function GalleryManager() {
     setItems((prev) => prev.map((x) => (x.name === name ? { ...x, ...patch } : x)));
   };
 
+  // Skeleton loader component
+  const SkeletonCard = () => (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
+      <div className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300" />
+      <div className="p-4 space-y-3">
+        <div className="h-3 bg-gray-200 rounded w-1/4" />
+        <div className="h-4 bg-gray-300 rounded w-3/4" />
+        <div className="flex gap-2 mt-3">
+          <div className="h-6 bg-gray-200 rounded-full w-16" />
+          <div className="h-6 bg-gray-200 rounded-full w-20" />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Gallery Manager</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Upload and manage your salon photos
+            {items.length > 0 && ` • ${items.length} image${items.length !== 1 ? 's' : ''}`}
+          </p>
+        </div>
+        <button
+          onClick={refresh}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          title="Refresh gallery"
+        >
+          <svg 
+            className={`w-4 h-4 text-gray-600 ${loading ? 'animate-spin' : ''}`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span className="font-medium text-sm">Refresh</span>
+        </button>
+      </div>
+
       {/* Upload Zone */}
       <div
         onDragOver={(e) => {
           e.preventDefault();
           setDragOverDropZone(true);
         }}
-        onDragLeave={() => setDragOverDropZone(false)}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          setDragOverDropZone(false);
+        }}
         onDrop={(e) => {
           e.preventDefault();
           setDragOverDropZone(false);
           onUpload(e.dataTransfer.files);
         }}
-        className={`relative border-2 border-dashed rounded-2xl p-12 transition-all ${
+        className={`relative border-2 border-dashed rounded-2xl p-10 transition-all duration-200 ${
           dragOverDropZone
-            ? "border-purple-500 bg-purple-50"
-            : "border-gray-300 bg-gray-50 hover:border-purple-400 hover:bg-purple-50/50"
+            ? "border-purple-500 bg-purple-50 scale-[1.02] shadow-lg"
+            : "border-gray-300 bg-gradient-to-br from-gray-50 to-white hover:border-purple-400 hover:bg-purple-50/30"
         }`}
       >
-        <div className="flex flex-col items-center justify-center gap-3">
-          <div className={`p-3 rounded-xl ${dragOverDropZone ? 'bg-purple-200' : 'bg-white border border-gray-200'}`}>
-            <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className={`p-4 rounded-2xl transition-all duration-200 ${
+            dragOverDropZone 
+              ? 'bg-purple-200 scale-110' 
+              : 'bg-white border-2 border-gray-200 shadow-sm'
+          }`}>
+            <svg className="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">
-              {dragOverDropZone ? "Drop your image" : "Drop image or click to upload"}
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              {uploading ? "Uploading..." : dragOverDropZone ? "Drop your image here" : "Upload Gallery Image"}
             </h3>
-            <p className="text-sm text-gray-600">Drag and drop your photo here, or use the button below</p>
+            <p className="text-sm text-gray-600 max-w-sm">
+              {uploading 
+                ? "Please wait while we process your image"
+                : "Drag and drop an image here, or click the button below to browse"
+              }
+            </p>
+            <p className="text-xs text-gray-500 mt-2">Supports: JPG, PNG, WebP • Max size: 10MB</p>
           </div>
-          <label className="mt-3 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium cursor-pointer hover:from-purple-700 hover:to-indigo-700 transition-all">
-            Choose Image
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => onUpload(e.target.files)}
-              disabled={loading}
-            />
-          </label>
+          {!uploading && (
+            <label className="mt-2 px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold cursor-pointer hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105">
+              Choose Image
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => onUpload(e.target.files)}
+                disabled={loading || uploading}
+              />
+            </label>
+          )}
+          {uploading && (
+            <div className="flex items-center gap-3 mt-2">
+              <svg className="animate-spin h-6 w-6 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span className="text-sm font-medium text-purple-700">Processing image...</span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Status Messages */}
-      {(loading || error) && (
-        <div className={`rounded-lg p-4 ${loading ? 'bg-blue-50 border border-blue-200' : 'bg-red-50 border border-red-200'}`}>
-          <div className="flex items-center gap-3">
-            {loading && (
-              <>
-                <svg className="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span className="text-sm font-medium text-blue-700">Processing...</span>
-              </>
-            )}
-            {error && !loading && (
-              <>
-                <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
-                </svg>
-                <span className="text-sm font-medium text-red-700">{error}</span>
-              </>
-            )}
+      {error && !loading && (
+        <div className="rounded-xl p-4 bg-red-50 border border-red-200 animate-in slide-in-from-top-2">
+          <div className="flex items-start gap-3">
+            <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+            </svg>
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold text-red-800">Error</h4>
+              <p className="text-sm text-red-700 mt-0.5">{error}</p>
+            </div>
+            <button 
+              onClick={() => setError(null)}
+              className="text-red-400 hover:text-red-600 transition-colors"
+              title="Dismiss error"
+              aria-label="Dismiss error"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
+              </svg>
+            </button>
           </div>
         </div>
       )}
 
       {/* Gallery Grid */}
-      {items.length === 0 ? (
-        <div className="text-center py-12">
-          <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">No images yet</h3>
-          <p className="text-gray-600">Start by uploading your first gallery image</p>
+      {loading && items.length === 0 ? (
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-2 w-2 bg-purple-600 rounded-full animate-bounce [animation-delay:0ms]" />
+            <div className="h-2 w-2 bg-purple-600 rounded-full animate-bounce [animation-delay:150ms]" />
+            <div className="h-2 w-2 bg-purple-600 rounded-full animate-bounce [animation-delay:300ms]" />
+            <span className="text-sm font-medium text-gray-600 ml-2">Loading gallery...</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </div>
+      ) : items.length === 0 ? (
+        <div className="text-center py-16 px-4">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 mb-6">
+            <svg className="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">No images in your gallery</h3>
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            Start building your gallery by uploading your first image. Showcase your best work to attract clients!
+          </p>
+          <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+              </svg>
+              <span>Easy drag & drop</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+              </svg>
+              <span>Add captions & tags</span>
+            </div>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {items.map((it) => (
             <div 
               key={it.name} 
-              className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all"
+              className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl hover:border-purple-200 transition-all duration-300 group"
             >
               {/* Image Container */}
-              <div className="relative w-full h-48 bg-gray-100 overflow-hidden group">
+              <div className="relative w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
                 <img
                   src={it.url}
                   alt={it.caption || it.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer"
+                  onClick={() => setLightboxImage({ url: it.url, caption: it.caption || it.name })}
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                  <button
-                    onClick={() => setEditingId(editingId === it.name ? null : it.name)}
-                    className="p-2 bg-white/90 hover:bg-white rounded-lg shadow-lg transition-all"
-                    title={editingId === it.name ? "Close" : "Edit"}
-                  >
-                    {editingId === it.name ? (
-                      <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
+                {/* Hover Overlay with Actions */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute top-3 right-3 flex gap-2">
+                    <button
+                      onClick={() => setEditingId(editingId === it.name ? null : it.name)}
+                      className="p-2.5 bg-white/95 hover:bg-white rounded-xl shadow-lg transition-all hover:scale-110 backdrop-blur-sm"
+                      title={editingId === it.name ? "Close editor" : "Edit image details"}
+                    >
+                      {editingId === it.name ? (
+                        <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                        </svg>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => openDeleteConfirm(it.name, it.caption || null, it.url, it.bucket)}
+                      className="p-2.5 bg-red-500/95 hover:bg-red-600 rounded-xl shadow-lg transition-all hover:scale-110 backdrop-blur-sm"
+                      title="Delete image"
+                    >
+                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"/>
                       </svg>
-                    ) : (
-                      <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                    </button>
+                  </div>
+                  {/* Quick View Button */}
+                  <div className="absolute bottom-3 right-3">
+                    <button
+                      onClick={() => setLightboxImage({ url: it.url, caption: it.caption || it.name })}
+                      className="p-2 bg-white/95 hover:bg-white rounded-lg shadow-lg transition-all backdrop-blur-sm"
+                      title="View full size"
+                    >
+                      <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                       </svg>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => openDeleteConfirm(it.name, it.caption || null, it.bucket)}
-                    className="p-2 bg-red-500/90 hover:bg-red-600 rounded-lg shadow-lg transition-all"
-                    title="Delete"
-                  >
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"/>
-                    </svg>
-                  </button>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {/* Info Section */}
               <div className="p-4 space-y-3">
-                <div>
-                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">Filename</p>
-                  <p className="text-sm font-mono text-gray-700 truncate">{it.name}</p>
-                </div>
-
                 {editingId === it.name ? (
-                  <div className="space-y-3 pt-2 border-t border-gray-100">
+                  <div className="space-y-4">
+                    {/* Edit Mode */}
+                    <div className="pb-3 border-b border-gray-100">
+                      <div className="flex items-center gap-2 text-purple-700">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                        </svg>
+                        <span className="text-xs font-semibold uppercase tracking-wider">Edit Mode</span>
+                      </div>
+                    </div>
+
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-2">Caption</label>
+                      <label className="block text-xs font-semibold text-gray-700 mb-2">Caption</label>
                       <input
                         type="text"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow text-sm"
+                        className="w-full border border-gray-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-sm"
                         value={it.caption || ""}
                         onChange={(e) => updateItem(it.name, { caption: e.target.value })}
-                        placeholder="Add a caption"
+                        placeholder="Describe this image..."
                       />
                     </div>
+
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-2">Tags (comma-separated)</label>
+                      <label className="block text-xs font-semibold text-gray-700 mb-2">
+                        Tags
+                        <span className="text-gray-500 font-normal ml-1">(comma-separated)</span>
+                      </label>
                       <input
                         type="text"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow text-sm"
+                        className="w-full border border-gray-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-sm"
                         value={(it.tags || []).join(", ")}
                         onChange={(e) => updateItem(it.name, { tags: e.target.value.split(",").map(t => t.trim()).filter(Boolean) })}
-                        placeholder="color, balayage, extensions"
+                        placeholder="color, balayage, highlights"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-2">Display Order</label>
+                      <label className="block text-xs font-semibold text-gray-700 mb-2">
+                        Display Order
+                        <span className="text-gray-500 font-normal ml-1">(lower appears first)</span>
+                      </label>
                       <input
                         type="number"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow text-sm"
+                        className="w-full border border-gray-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-sm"
                         value={typeof it.display_order === "number" ? it.display_order : ""}
                         onChange={(e) => updateItem(it.name, { display_order: e.target.value === "" ? null : parseInt(e.target.value, 10) })}
-                        placeholder="Lower numbers appear first"
+                        placeholder="1"
                       />
                     </div>
-                    <div className="flex items-center gap-2 py-2">
+
+                    <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-xl border border-purple-100">
                       <input
                         id={`before-after-${it.name}`}
                         type="checkbox"
                         checked={it.is_before_after || false}
                         onChange={(e) => updateItem(it.name, { is_before_after: e.target.checked })}
-                        className="w-4 h-4 text-purple-600 rounded border-gray-300"
+                        className="w-4 h-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
                       />
-                      <label htmlFor={`before-after-${it.name}`} className="text-sm text-gray-700 cursor-pointer">
+                      <label htmlFor={`before-after-${it.name}`} className="text-sm text-gray-800 cursor-pointer font-medium">
                         Mark as Before/After Transformation
                       </label>
                     </div>
-                    <div className="flex gap-2 pt-3 border-t border-gray-100">
+
+                    <div className="flex gap-2.5 pt-3 border-t border-gray-100">
                       <button
                         onClick={() => setEditingId(null)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium text-sm"
+                        className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold text-sm"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={() => onSave(it)}
                         disabled={loading}
-                        className="flex-1 px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50 font-medium text-sm"
+                        className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm shadow-md hover:shadow-lg"
                       >
-                        Save Changes
+                        {loading ? "Saving..." : "Save Changes"}
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div>
+                  <>
+                    {/* View Mode */}
+                    <div>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1.5">Filename</p>
+                      <p className="text-sm font-mono text-gray-800 truncate bg-gray-50 px-2 py-1 rounded">{it.name}</p>
+                    </div>
+
                     {it.caption && (
-                      <p className="text-sm text-gray-700 line-clamp-2">{it.caption}</p>
+                      <div>
+                        <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed">{it.caption}</p>
+                      </div>
                     )}
+
                     {it.tags && it.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {it.tags.slice(0, 2).map((tag) => (
-                          <span key={tag} className="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                      <div className="flex flex-wrap gap-1.5">
+                        {it.tags.slice(0, 3).map((tag) => (
+                          <span key={tag} className="inline-flex items-center px-2.5 py-1 bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 text-xs rounded-full font-medium">
+                            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd"/>
+                            </svg>
                             {tag}
                           </span>
                         ))}
-                        {it.tags.length > 2 && (
-                          <span className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                            +{it.tags.length - 2} more
+                        {it.tags.length > 3 && (
+                          <span className="inline-flex items-center px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium">
+                            +{it.tags.length - 3}
                           </span>
                         )}
                       </div>
                     )}
-                  </div>
+
+                    {it.display_order !== null && it.display_order !== undefined && (
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h7a1 1 0 100-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3z"/>
+                        </svg>
+                        <span>Display order: {it.display_order}</span>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -379,42 +552,107 @@ export default function GalleryManager() {
         </div>
       )}
 
+      {/* Image Lightbox */}
+      {lightboxImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm animate-in fade-in"
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            onClick={() => setLightboxImage(null)}
+            className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all backdrop-blur-md"
+            title="Close"
+          >
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
+            </svg>
+          </button>
+          <div className="max-w-5xl w-full" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={lightboxImage.url}
+              alt={lightboxImage.caption}
+              className="w-full h-auto max-h-[85vh] object-contain rounded-lg shadow-2xl"
+            />
+            {lightboxImage.caption && (
+              <p className="text-white text-center mt-4 text-lg font-medium">{lightboxImage.caption}</p>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {deleteConfirm.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full space-y-4 animate-in fade-in slide-in-from-bottom-4">
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-red-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full space-y-5 animate-in zoom-in-95 slide-in-from-bottom-4">
+            {/* Header with Icon */}
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-xl bg-red-100">
                 <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete Image?</h3>
-                {deleteConfirm.itemCaption && (
-                  <p className="text-sm text-gray-600 mt-0.5">
-                    {deleteConfirm.itemCaption}
-                  </p>
-                )}
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-gray-900">Delete Image?</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  This action cannot be undone
+                </p>
               </div>
             </div>
-            <p className="text-sm text-gray-600">
-              This action cannot be undone. The image will be permanently removed from your gallery.
+
+            {/* Image Preview */}
+            {deleteConfirm.itemUrl && (
+              <div className="rounded-xl overflow-hidden border-2 border-gray-200">
+                <img
+                  src={deleteConfirm.itemUrl}
+                  alt={deleteConfirm.itemCaption || "Image to delete"}
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+            )}
+
+            {/* Details */}
+            <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+              {deleteConfirm.itemCaption && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Caption</p>
+                  <p className="text-sm text-gray-800 font-medium">{deleteConfirm.itemCaption}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">File</p>
+                <p className="text-sm text-gray-800 font-mono truncate">{deleteConfirm.itemName}</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600 px-1">
+              The image will be permanently removed from your gallery and cannot be recovered.
             </p>
-            <div className="flex gap-3 justify-end pt-2">
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
               <button
                 onClick={closeDeleteConfirm}
-                className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
+                className="flex-1 px-5 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold disabled:opacity-50"
                 disabled={loading}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 font-medium"
+                className="flex-1 px-5 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all disabled:opacity-50 font-semibold shadow-lg hover:shadow-xl"
                 disabled={loading}
               >
-                {loading ? "Deleting..." : "Delete"}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Deleting...
+                  </span>
+                ) : (
+                  "Delete Image"
+                )}
               </button>
             </div>
           </div>
