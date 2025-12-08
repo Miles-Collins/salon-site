@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { isOwner } from "@/lib/authz";
 
 const GALLERY_BUCKET = "gallery";
 const TRANSFORMATIONS_BUCKET = "gallery-transformations";
@@ -9,11 +8,6 @@ const SERVICES_BUCKET = "gallery-services";
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  // Server-side owner check
-  if (!(await isOwner())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -59,6 +53,8 @@ export async function GET() {
     ...(transformationsRes.data || []).map((f) => ({ ...f, bucket: TRANSFORMATIONS_BUCKET })),
     ...(servicesRes.data || []).map((f) => ({ ...f, bucket: SERVICES_BUCKET })),
   ]
+    // ignore storage helper files
+    .filter((f: any) => !f.name?.startsWith("."))
     .map((f: any) => {
       const meta = metaMap.get(f.name);
       const bucketName = meta?.bucket || f.bucket;

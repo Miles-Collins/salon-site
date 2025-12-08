@@ -1,5 +1,4 @@
 import Section from "@/components/Section";
-import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
@@ -24,37 +23,34 @@ type GalleryImage = {
   tags?: string[];
   is_before_after?: boolean;
   before_image?: string;
-    url?: string;
-    before_url?: string;
+  url?: string;
+  before_url?: string;
 };
 
 async function getTransformations() {
-  // If env vars are missing (e.g., during build without Supabase), return empty array
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return [];
-  }
-  
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
-  const { data } = await supabase
-    .from("gallery_images")
-    .select("*")
-    .eq("is_before_after", true)
-    .order("display_order", { ascending: true })
-    .order("created_at", { ascending: false });
+  const res = await fetch(`${baseUrl}/api/owner/gallery/list`, { cache: "no-store" });
+  if (!res.ok) return [];
 
-  // Construct public URLs for transformations bucket
-  const transformationsPublicBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery-transformations`;
-  const galleryPublicBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery`;
+  const json = await res.json();
+  const items = (json.items || []) as any[];
 
-  return (data || []).map((img: any) => ({
-    ...img,
-    url: `${transformationsPublicBase}/${encodeURIComponent(img.name)}`,
-    before_url: img.before_image ? `${galleryPublicBase}/${encodeURIComponent(img.before_image)}` : null,
-  })) as GalleryImage[];
+  return items
+    .filter((i) => i.is_before_after && i.bucket === "gallery-transformations")
+    .map((i) => ({
+      name: i.name,
+      caption: i.caption || undefined,
+      tags: i.tags || [],
+      is_before_after: true,
+      before_image: i.before_image || undefined,
+      url: i.url,
+      before_url: i.before_image
+        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery/${encodeURIComponent(i.before_image)}`
+        : null,
+    }));
 }
 
 export default async function TransformationsPage() {

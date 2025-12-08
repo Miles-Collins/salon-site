@@ -20,6 +20,8 @@ type DeleteConfirmation = {
   itemCaption: string | null;
   itemUrl?: string | null;
   bucket?: string;
+  items?: { name: string; caption: string | null; url: string; bucket?: string }[];
+  mode?: "single" | "bulk";
 };
 
 type UploadFile = {
@@ -37,6 +39,14 @@ export default function GalleryManager() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [unsavedChanges, setUnsavedChanges] = useState<Set<string>>(new Set());
+  const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ items: Item[]; timer: NodeJS.Timeout | null } | null>(null);
+  const historyRef = React.useRef<Record<string, Item[]>>({});
+  const historyIndexRef = React.useRef<Record<string, number>>({});
+  const autoSaveTimers = React.useRef<Record<string, NodeJS.Timeout>>({});
   const [lightboxImage, setLightboxImage] = useState<{ url: string; caption: string } | null>(null);
   const [dragOverDropZone, setDragOverDropZone] = useState(false);
   const [uploadQueue, setUploadQueue] = useState<UploadFile[]>([]);
@@ -47,6 +57,8 @@ export default function GalleryManager() {
     itemCaption: null,
     itemUrl: null,
     bucket: undefined,
+    items: [],
+    mode: "single",
   });
   const toast = useToast();
 
@@ -57,6 +69,8 @@ export default function GalleryManager() {
       itemCaption: caption,
       itemUrl: url,
       bucket: bucket,
+      items: [{ name, caption, url, bucket }],
+      mode: "single",
     });
   };
 
@@ -67,32 +81,68 @@ export default function GalleryManager() {
       itemCaption: null,
       itemUrl: null,
       bucket: undefined,
+      items: [],
+      mode: "single",
     });
   };
 
-  const confirmDelete = async () => {
-    if (!deleteConfirm.itemName) return;
-    const name = deleteConfirm.itemName;
-    const bucket = deleteConfirm.bucket || "gallery";
-    closeDeleteConfirm();
-    
-    setLoading(true);
-    setError(null);
+  const performDeleteNow = async (itemsToDelete: Item[]) => {
     try {
-      const res = await fetch("/api/owner/gallery/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, bucket }),
-      });
-      if (!res.ok) throw new Error("Delete failed");
+      for (const it of itemsToDelete) {
+        const res = await fetch("/api/owner/gallery/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: it.name, bucket: it.bucket || "gallery" }),
+        });
+        if (!res.ok) throw new Error("Delete failed");
+      }
+      toast.success(itemsToDelete.length > 1 ? "Images deleted" : "Image deleted");
       await refresh();
-      toast.success("Image deleted");
     } catch (e: any) {
       setError(e?.message || "Delete failed");
       toast.error("Delete failed");
-    } finally {
-      setLoading(false);
     }
+  };
+
+  const confirmDelete = () => {
+    const targetItems = (deleteConfirm.items || []).length
+      ? (deleteConfirm.items || []).map((it) => items.find((x) => x.name === it.name)).filter(Boolean) as Item[]
+      : deleteConfirm.itemName
+        ? (items.filter((x) => x.name === deleteConfirm.itemName))
+        : [];
+
+    if (targetItems.length === 0) {
+      closeDeleteConfirm();
+      return;
+    }
+
+    closeDeleteConfirm();
+
+    // Optimistic remove with 5s undo window
+    setItems((prev) => prev.filter((x) => !targetItems.some((t) => t.name === x.name)));
+    setSelectedItems((prev) => {
+      const next = new Set(prev);
+      targetItems.forEach((t) => next.delete(t.name));
+      return next;
+    });
+
+    const timer = setTimeout(() => {
+      setPendingDelete(null);
+      performDeleteNow(targetItems);
+    }, 5000);
+
+    setPendingDelete({ items: targetItems, timer });
+  };
+
+  const undoPendingDelete = () => {
+    if (!pendingDelete) return;
+    if (pendingDelete.timer) clearTimeout(pendingDelete.timer);
+    setItems((prev) => {
+      const merged = [...prev, ...pendingDelete.items];
+      return merged.sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+    });
+    setPendingDelete(null);
+    toast.success("Deletion undone");
   };
 
   const refresh = async () => {
@@ -120,6 +170,117 @@ export default function GalleryManager() {
   useEffect(() => {
     refresh();
   }, []);
+
+  const markUnsaved = (name: string) => {
+    setUnsavedChanges((prev) => new Set(prev).add(name));
+  };
+
+  const clearUnsaved = (name: string) => {
+    setUnsavedChanges((prev) => {
+      const next = new Set(prev);
+      next.delete(name);
+      return next;
+    });
+  };
+
+  const pushHistory = (name: string, snapshot: Item) => {
+    const history = historyRef.current[name] || [];
+    const index = historyIndexRef.current[name] ?? history.length - 1;
+    const trimmed = history.slice(0, index + 1);
+    const next = [...trimmed, snapshot].slice(-10);
+    historyRef.current[name] = next;
+    historyIndexRef.current[name] = next.length - 1;
+  };
+
+  const undo = (name: string) => {
+    const history = historyRef.current[name] || [];
+    const idx = historyIndexRef.current[name] ?? history.length - 1;
+    if (idx <= 0) return;
+    const nextIdx = idx - 1;
+    const snapshot = history[nextIdx];
+    setItems((prev) => prev.map((x) => (x.name === name ? { ...x, ...snapshot } : x)));
+    historyIndexRef.current[name] = nextIdx;
+    markUnsaved(name);
+  };
+
+  const redo = (name: string) => {
+    const history = historyRef.current[name] || [];
+    const idx = historyIndexRef.current[name] ?? history.length - 1;
+    if (idx >= history.length - 1) return;
+    const nextIdx = idx + 1;
+    const snapshot = history[nextIdx];
+    setItems((prev) => prev.map((x) => (x.name === name ? { ...x, ...snapshot } : x)));
+    historyIndexRef.current[name] = nextIdx;
+    markUnsaved(name);
+  };
+
+  const queueAutoSave = (it: Item) => {
+    const timer = autoSaveTimers.current[it.name];
+    if (timer) clearTimeout(timer);
+    autoSaveTimers.current[it.name] = setTimeout(() => {
+      onSave(it, { auto: true });
+    }, 1200);
+  };
+
+  const toggleSelect = (name: string) => {
+    setSelectedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
+      return next;
+    });
+  };
+
+  const clearSelection = () => setSelectedItems(new Set());
+
+  const handleDragStart = (name: string) => setDraggingId(name);
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, targetName: string) => {
+    e.preventDefault();
+    if (draggingId === targetName) return;
+  };
+
+  const handleDrop = (targetName: string) => {
+    if (!draggingId || draggingId === targetName) return;
+    setItems((prev) => {
+      const fromIndex = prev.findIndex((x) => x.name === draggingId);
+      const toIndex = prev.findIndex((x) => x.name === targetName);
+      if (fromIndex === -1 || toIndex === -1) return prev;
+      const updated = [...prev];
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
+      // Reassign display_order based on new positions
+      const withOrder = updated.map((it, idx) => ({ ...it, display_order: idx + 1 }));
+      withOrder.forEach((it) => {
+        markUnsaved(it.name);
+        queueAutoSave(it);
+      });
+      return withOrder;
+    });
+    setDraggingId(null);
+  };
+
+  const openBulkDelete = () => {
+    if (selectedItems.size === 0) return;
+    const targets = items.filter((it) => selectedItems.has(it.name)).map((it) => ({
+      name: it.name,
+      caption: it.caption || null,
+      url: it.url,
+      bucket: it.bucket,
+    }));
+    setDeleteConfirm({
+      isOpen: true,
+      itemName: null,
+      itemCaption: null,
+      itemUrl: null,
+      bucket: undefined,
+      items: targets,
+      mode: "bulk",
+    });
+  };
 
   const handleFileSelection = (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -259,8 +420,8 @@ export default function GalleryManager() {
     handleFileSelection(files);
   };
 
-  const onSave = async (it: Item) => {
-    setLoading(true);
+  const onSave = async (it: Item, opts: { auto?: boolean } = {}) => {
+    setSavingIds((prev) => new Set(prev).add(it.name));
     setError(null);
     try {
       const res = await fetch("/api/owner/gallery/update", {
@@ -277,19 +438,43 @@ export default function GalleryManager() {
         }),
       });
       if (!res.ok) throw new Error("Save failed");
-      await refresh();
-      setEditingId(null);
-      toast.success("Changes saved");
+      clearUnsaved(it.name);
+      if (!opts.auto) {
+        setEditingId(null);
+        toast.success("Changes saved");
+      }
     } catch (e: any) {
       setError(e?.message || "Save failed");
-      toast.error("Save failed");
+      if (!opts.auto) toast.error("Save failed");
     } finally {
-      setLoading(false);
+      setSavingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(it.name);
+        return next;
+      });
     }
   };
 
   const updateItem = (name: string, patch: Partial<Item>) => {
-    setItems((prev) => prev.map((x) => (x.name === name ? { ...x, ...patch } : x)));
+    setItems((prev) => {
+      let previous: Item | null = null;
+      let nextItem: Item | null = null;
+
+      const updated = prev.map((x) => {
+        if (x.name !== name) return x;
+        previous = x;
+        nextItem = { ...x, ...patch };
+        return nextItem;
+      });
+
+      if (previous && nextItem) {
+        pushHistory(name, previous);
+        markUnsaved(name);
+        queueAutoSave(nextItem);
+      }
+
+      return updated;
+    });
   };
 
   // Skeleton loader component
@@ -570,6 +755,31 @@ export default function GalleryManager() {
         </div>
       )}
 
+      {selectedItems.size > 0 && (
+        <div className="flex items-center justify-between gap-3 p-4 bg-purple-50 border border-purple-100 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="px-3 py-1 bg-white rounded-lg border border-purple-100 text-sm font-semibold text-purple-700">
+              {selectedItems.size} selected
+            </div>
+            <p className="text-sm text-gray-700">Bulk actions for selected images</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={clearSelection}
+              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50"
+            >
+              Clear
+            </button>
+            <button
+              onClick={openBulkDelete}
+              className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 shadow-sm"
+            >
+              Delete Selected
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Status Messages */}
       {error && !loading && (
         <div className="rounded-xl p-4 bg-red-50 border border-red-200 animate-in slide-in-from-top-2">
@@ -641,10 +851,26 @@ export default function GalleryManager() {
           {items.map((it) => (
             <div 
               key={it.name} 
-              className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl hover:border-purple-200 transition-all duration-300 group"
+              draggable
+              onDragStart={() => handleDragStart(it.name)}
+              onDragOver={(e) => handleDragOver(e, it.name)}
+              onDrop={() => handleDrop(it.name)}
+              onDragEnd={() => setDraggingId(null)}
+              className={`bg-white rounded-2xl shadow-sm border ${draggingId === it.name ? 'border-purple-400 ring-2 ring-purple-200' : 'border-gray-200'} overflow-hidden hover:shadow-xl hover:border-purple-200 transition-all duration-300 group cursor-grab active:cursor-grabbing`}
             >
               {/* Image Container */}
               <div className="relative w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                <div className="absolute top-3 left-3 z-10">
+                  <label className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm border border-gray-200 cursor-pointer text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.has(it.name)}
+                      onChange={() => toggleSelect(it.name)}
+                      className="h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                    />
+                    <span>Select</span>
+                  </label>
+                </div>
                 <img
                   src={it.url}
                   alt={it.caption || it.name}
@@ -700,12 +926,43 @@ export default function GalleryManager() {
                 {editingId === it.name ? (
                   <div className="space-y-4">
                     {/* Edit Mode */}
-                    <div className="pb-3 border-b border-gray-100">
+                    <div className="pb-3 border-b border-gray-100 flex items-center justify-between">
                       <div className="flex items-center gap-2 text-purple-700">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
                         </svg>
                         <span className="text-xs font-semibold uppercase tracking-wider">Edit Mode</span>
+                        {unsavedChanges.has(it.name) && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold text-amber-800 bg-amber-100 rounded-full border border-amber-200">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                            Unsaved
+                          </span>
+                        )}
+                        {savingIds.has(it.name) && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold text-green-800 bg-green-100 rounded-full border border-green-200">
+                            <svg className="w-3 h-3 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Saving
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => undo(it.name)}
+                          className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50"
+                          title="Undo"
+                        >
+                          Undo
+                        </button>
+                        <button
+                          onClick={() => redo(it.name)}
+                          className="px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50"
+                          title="Redo"
+                        >
+                          Redo
+                        </button>
                       </div>
                     </div>
 
@@ -853,6 +1110,18 @@ export default function GalleryManager() {
         </div>
       )}
 
+      {pendingDelete && (
+        <div className="fixed bottom-4 right-4 z-50 bg-gray-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+          <span className="text-sm">Images scheduled for deletion. Undo?</span>
+          <button
+            onClick={undoPendingDelete}
+            className="px-3 py-1.5 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-100"
+          >
+            Undo
+          </button>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {deleteConfirm.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in">
@@ -872,8 +1141,8 @@ export default function GalleryManager() {
               </div>
             </div>
 
-            {/* Image Preview */}
-            {deleteConfirm.itemUrl && (
+            {/* Image Preview / List */}
+            {deleteConfirm.mode === "single" && deleteConfirm.itemUrl && (
               <div className="rounded-xl overflow-hidden border-2 border-gray-200">
                 <img
                   src={deleteConfirm.itemUrl}
@@ -883,22 +1152,35 @@ export default function GalleryManager() {
               </div>
             )}
 
+            {deleteConfirm.mode === "bulk" && (
+              <div className="max-h-48 overflow-auto rounded-xl border border-gray-200 bg-gray-50 p-3 space-y-2">
+                {deleteConfirm.items?.map((it) => (
+                  <div key={it.name} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="font-medium text-gray-800 truncate">{it.caption || it.name}</span>
+                    <span className="text-xs text-gray-500 font-mono truncate">{it.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Details */}
             <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-              {deleteConfirm.itemCaption && (
+              {deleteConfirm.mode === "single" && deleteConfirm.itemCaption && (
                 <div>
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Caption</p>
                   <p className="text-sm text-gray-800 font-medium">{deleteConfirm.itemCaption}</p>
                 </div>
               )}
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">File</p>
-                <p className="text-sm text-gray-800 font-mono truncate">{deleteConfirm.itemName}</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{deleteConfirm.mode === "bulk" ? "Files" : "File"}</p>
+                <p className="text-sm text-gray-800 font-mono truncate">
+                  {deleteConfirm.mode === "bulk" ? `${deleteConfirm.items?.length || 0} files selected` : deleteConfirm.itemName}
+                </p>
               </div>
             </div>
 
             <p className="text-sm text-gray-600 px-1">
-              The image will be permanently removed from your gallery and cannot be recovered.
+              The image will be deleted after a 5 second grace period. You can undo during that window.
             </p>
 
             {/* Actions */}
