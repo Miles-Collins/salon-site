@@ -143,7 +143,7 @@ export default async function TransformationsPage() {
 
                     {transformation.tags && transformation.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 justify-center">
-                        {transformation.tags.map((tag) => (
+                        {transformation.tags.map((tag: string) => (
                           <span
                             key={tag}
                             className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full"
