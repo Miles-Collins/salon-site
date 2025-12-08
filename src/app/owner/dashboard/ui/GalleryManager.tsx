@@ -22,6 +22,15 @@ type DeleteConfirmation = {
   bucket?: string;
 };
 
+type UploadFile = {
+  id: string;
+  file: File;
+  preview: string;
+  progress: number;
+  status: 'pending' | 'uploading' | 'success' | 'error';
+  error?: string;
+};
+
 export default function GalleryManager() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +39,8 @@ export default function GalleryManager() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; caption: string } | null>(null);
   const [dragOverDropZone, setDragOverDropZone] = useState(false);
+  const [uploadQueue, setUploadQueue] = useState<UploadFile[]>([]);
+  const [showUploadPreview, setShowUploadPreview] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmation>({
     isOpen: false,
     itemName: null,
@@ -110,47 +121,142 @@ export default function GalleryManager() {
     refresh();
   }, []);
 
-  const onUpload = async (files: FileList | null) => {
+  const handleFileSelection = (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    
-    const file = files[0];
-    
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error("Please select an image file");
-      return;
+
+    const newFiles: UploadFile[] = [];
+    const errors: string[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        errors.push(`${file.name}: Not an image file`);
+        continue;
+      }
+
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        errors.push(`${file.name}: File size exceeds 10MB`);
+        continue;
+      }
+
+      // Create preview URL
+      const preview = URL.createObjectURL(file);
+
+      newFiles.push({
+        id: `${Date.now()}-${i}`,
+        file,
+        preview,
+        progress: 0,
+        status: 'pending',
+      });
     }
-    
-    // Validate file size (10MB max)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Image must be smaller than 10MB");
-      return;
+
+    if (errors.length > 0) {
+      toast.error(errors.join(', '));
     }
-    
+
+    if (newFiles.length > 0) {
+      setUploadQueue(prev => [...prev, ...newFiles]);
+      setShowUploadPreview(true);
+    }
+  };
+
+  const removeFromQueue = (id: string) => {
+    setUploadQueue(prev => {
+      const file = prev.find(f => f.id === id);
+      if (file?.preview) {
+        URL.revokeObjectURL(file.preview);
+      }
+      return prev.filter(f => f.id !== id);
+    });
+  };
+
+  const clearCompletedUploads = () => {
+    setUploadQueue(prev => {
+      prev.forEach(f => {
+        if (f.preview && (f.status === 'success' || f.status === 'error')) {
+          URL.revokeObjectURL(f.preview);
+        }
+      });
+      return prev.filter(f => f.status === 'pending' || f.status === 'uploading');
+    });
+  };
+
+  const uploadSingleFile = async (uploadFile: UploadFile) => {
     const form = new FormData();
-    form.append("file", file);
-    
-    setUploading(true);
-    setError(null);
-    
+    form.append("file", uploadFile.file);
+
+    // Update status to uploading
+    setUploadQueue(prev => prev.map(f => 
+      f.id === uploadFile.id ? { ...f, status: 'uploading' as const, progress: 0 } : f
+    ));
+
     try {
       const res = await fetch("/api/owner/gallery/upload", {
         method: "POST",
         body: form,
       });
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || "Upload failed");
       }
-      await refresh();
-      toast.success(`${file.name} uploaded successfully`);
-      setDragOverDropZone(false);
+
+      // Simulate progress for visual feedback
+      for (let progress = 0; progress <= 100; progress += 20) {
+        setUploadQueue(prev => prev.map(f => 
+          f.id === uploadFile.id ? { ...f, progress } : f
+        ));
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
+      // Mark as success
+      setUploadQueue(prev => prev.map(f => 
+        f.id === uploadFile.id ? { ...f, status: 'success' as const, progress: 100 } : f
+      ));
+
+      toast.success(`${uploadFile.file.name} uploaded successfully`);
     } catch (e: any) {
-      setError(e?.message || "Upload failed");
-      toast.error(e?.message || "Upload failed");
-    } finally {
-      setUploading(false);
+      setUploadQueue(prev => prev.map(f => 
+        f.id === uploadFile.id ? { 
+          ...f, 
+          status: 'error' as const, 
+          error: e?.message || "Upload failed" 
+        } : f
+      ));
+      toast.error(`${uploadFile.file.name}: ${e?.message || "Upload failed"}`);
     }
+  };
+
+  const startUpload = async () => {
+    const pendingFiles = uploadQueue.filter(f => f.status === 'pending');
+    if (pendingFiles.length === 0) return;
+
+    setUploading(true);
+    setError(null);
+
+    // Upload files sequentially to avoid overwhelming the server
+    for (const file of pendingFiles) {
+      await uploadSingleFile(file);
+    }
+
+    setUploading(false);
+    await refresh();
+    
+    // Auto-clear completed uploads after a short delay
+    setTimeout(() => {
+      clearCompletedUploads();
+      if (uploadQueue.every(f => f.status === 'success' || f.status === 'error')) {
+        setShowUploadPreview(false);
+      }
+    }, 2000);
+  };
+
+  const onUpload = async (files: FileList | null) => {
+    handleFileSelection(files);
   };
 
   const onSave = async (it: Item) => {
@@ -263,39 +369,206 @@ export default function GalleryManager() {
           </div>
           <div className="text-center">
             <h3 className="text-xl font-bold text-gray-900 mb-2">
-              {uploading ? "Uploading..." : dragOverDropZone ? "Drop your image here" : "Upload Gallery Image"}
+              {dragOverDropZone ? "Drop your images here" : "Upload Gallery Images"}
             </h3>
             <p className="text-sm text-gray-600 max-w-sm">
-              {uploading 
-                ? "Please wait while we process your image"
-                : "Drag and drop an image here, or click the button below to browse"
+              {dragOverDropZone
+                ? "Release to add images to upload queue"
+                : "Drag and drop images here, or click the button below to browse"
               }
             </p>
-            <p className="text-xs text-gray-500 mt-2">Supports: JPG, PNG, WebP • Max size: 10MB</p>
+            <p className="text-xs text-gray-500 mt-2">
+              Supports: JPG, PNG, WebP • Max size: 10MB per image • Multiple files supported
+            </p>
           </div>
           {!uploading && (
             <label className="mt-2 px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold cursor-pointer hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105">
-              Choose Image
+              Choose Images
               <input
                 type="file"
                 accept="image/*"
+                multiple
                 className="hidden"
                 onChange={(e) => onUpload(e.target.files)}
                 disabled={loading || uploading}
               />
             </label>
           )}
-          {uploading && (
-            <div className="flex items-center gap-3 mt-2">
-              <svg className="animate-spin h-6 w-6 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span className="text-sm font-medium text-purple-700">Processing image...</span>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Upload Preview Modal */}
+      {showUploadPreview && uploadQueue.length > 0 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-indigo-50">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">Upload Queue</h3>
+                <p className="text-sm text-gray-600 mt-0.5">
+                  {uploadQueue.length} image{uploadQueue.length !== 1 ? 's' : ''} ready to upload
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (!uploading) {
+                    uploadQueue.forEach(f => {
+                      if (f.preview) URL.revokeObjectURL(f.preview);
+                    });
+                    setUploadQueue([]);
+                    setShowUploadPreview(false);
+                  }
+                }}
+                disabled={uploading}
+                className="p-2 rounded-lg hover:bg-white/80 transition-colors disabled:opacity-50"
+                title="Close preview"
+              >
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Preview Grid */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {uploadQueue.map((uploadFile) => (
+                  <div
+                    key={uploadFile.id}
+                    className="relative bg-gray-50 rounded-xl overflow-hidden border-2 border-gray-200 group"
+                  >
+                    {/* Image Preview */}
+                    <div className="aspect-square relative">
+                      <Image
+                        src={uploadFile.preview}
+                        alt={uploadFile.file.name}
+                        fill
+                        className="object-cover"
+                      />
+                      
+                      {/* Status Overlay */}
+                      {uploadFile.status === 'uploading' && (
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                          <div className="text-center">
+                            <svg className="animate-spin h-8 w-8 text-white mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p className="text-white text-sm font-medium">{uploadFile.progress}%</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {uploadFile.status === 'success' && (
+                        <div className="absolute inset-0 bg-green-500/20 backdrop-blur-sm flex items-center justify-center">
+                          <div className="bg-green-500 rounded-full p-2">
+                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {uploadFile.status === 'error' && (
+                        <div className="absolute inset-0 bg-red-500/20 backdrop-blur-sm flex items-center justify-center">
+                          <div className="bg-red-500 rounded-full p-2">
+                            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Remove Button */}
+                      {uploadFile.status === 'pending' && (
+                        <button
+                          onClick={() => removeFromQueue(uploadFile.id)}
+                          className="absolute top-2 right-2 p-1.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
+                          title="Remove from queue"
+                        >
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* File Info */}
+                    <div className="p-3 bg-white">
+                      <p className="text-xs font-medium text-gray-900 truncate" title={uploadFile.file.name}>
+                        {uploadFile.file.name}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {(uploadFile.file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                      {uploadFile.status === 'error' && uploadFile.error && (
+                        <p className="text-xs text-red-600 mt-1 font-medium">{uploadFile.error}</p>
+                      )}
+                    </div>
+
+                    {/* Progress Bar */}
+                    {uploadFile.status === 'uploading' && (
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
+                        <div
+                          className="h-full bg-gradient-to-r from-purple-600 to-indigo-600 transition-all duration-300"
+                          style={{ width: `${uploadFile.progress}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                {uploadQueue.filter(f => f.status === 'success').length > 0 && (
+                  <span className="text-green-600 font-medium">
+                    {uploadQueue.filter(f => f.status === 'success').length} uploaded
+                  </span>
+                )}
+                {uploadQueue.filter(f => f.status === 'error').length > 0 && (
+                  <span className="text-red-600 font-medium ml-3">
+                    {uploadQueue.filter(f => f.status === 'error').length} failed
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={clearCompletedUploads}
+                  disabled={uploading || !uploadQueue.some(f => f.status === 'success' || f.status === 'error')}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Clear Completed
+                </button>
+                <button
+                  onClick={startUpload}
+                  disabled={uploading || !uploadQueue.some(f => f.status === 'pending')}
+                  className="px-6 py-2 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {uploading ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      Upload {uploadQueue.filter(f => f.status === 'pending').length} Image{uploadQueue.filter(f => f.status === 'pending').length !== 1 ? 's' : ''}
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Status Messages */}
       {error && !loading && (

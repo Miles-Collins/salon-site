@@ -1,98 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { trackSocialClick, trackFormSubmission } from "@/lib/analytics";
+import { trackSocialClick } from "@/lib/analytics";
 
 export default function Footer() {
-  const [email, setEmail] = useState("");
-  const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setSubscribeStatus("loading");
-    try {
-      // Simulate newsletter subscription
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setSubscribeStatus("success");
-      trackFormSubmission('newsletter', true);
-      setEmail("");
-      setTimeout(() => setSubscribeStatus("idle"), 3000);
-    } catch (error) {
-      setSubscribeStatus("error");
-      trackFormSubmission('newsletter', false);
-      setTimeout(() => setSubscribeStatus("idle"), 3000);
-    }
-  };
-
   return (
     <footer className="bg-black text-white pt-24 md:pt-32 pb-8">
-      {/* Newsletter & Instagram Section */}
-      <div className="container mx-auto px-4 mb-20 md:mb-32">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
-          {/* Newsletter */}
-          <div className="flex flex-col justify-center">
-            <h3 className="text-2xl md:text-3xl font-playfair mb-4 text-[#C9A961]">Stay Connected</h3>
-            <p className="text-white/70 text-sm mb-6">Get updates on new services, special offers, and beauty tips delivered to your inbox.</p>
-            <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-[#C9A961] focus:ring-1 focus:ring-[#C9A961]/30 transition"
-                  disabled={subscribeStatus === "loading"}
-                />
-                <button
-                  type="submit"
-                  disabled={subscribeStatus === "loading"}
-                  className="px-6 py-3 bg-[#C9A961] text-black font-semibold uppercase tracking-wider hover:bg-[#B8985A] disabled:opacity-50 transition duration-300"
-                >
-                  {subscribeStatus === "loading" ? "..." : "Subscribe"}
-                </button>
-              </div>
-              {subscribeStatus === "success" && (
-                <p className="text-[#C9A961] text-sm animate-fade-in-up">✓ Successfully subscribed!</p>
-              )}
-              {subscribeStatus === "error" && (
-                <p className="text-red-400 text-sm animate-fade-in-up">Please try again</p>
-              )}
-            </form>
-          </div>
-
-          {/* Instagram Feed Preview */}
-          <div>
-            <h3 className="text-2xl md:text-3xl font-playfair mb-4 text-[#C9A961]">@ColorRebelPorscha</h3>
-            <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
-              {[...Array(6)].map((_, i) => (
-                <a
-                  key={i}
-                  href="https://www.instagram.com/colorrebelporscha/"
-                  target="_blank"
-                  rel="noopener"
-                  className="aspect-square bg-gradient-to-br from-[#C9A961]/20 to-[#2D7D5E]/20 rounded-sm hover:shadow-lg hover:shadow-[#C9A961]/30 transition duration-300 relative group overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition flex items-center justify-center">
-                    <span className="text-white/60 group-hover:text-white transition">📸</span>
-                  </div>
-                </a>
-              ))}
-            </div>
-            <a
-              href="https://www.instagram.com/colorrebelporscha/"
-              target="_blank"
-              rel="noopener"
-              className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-[#C9A961] transition"
-            >
-              Follow on Instagram →
-            </a>
-          </div>
-        </div>
-      </div>
-
       {/* Map & Hours Section */}
       <div className="mb-20 md:mb-32">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
