@@ -3,6 +3,10 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useToast } from "@/components/Toast";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 import TransformationPairBuilder from "./TransformationPairBuilder";
 
 type Item = {
@@ -20,6 +24,7 @@ export default function TransformationsManager() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dragOverDropZone, setDragOverDropZone] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const toast = useToast();
 
   const refresh = async () => {
@@ -121,6 +126,24 @@ export default function TransformationsManager() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Transformations Manager</h2>
+          <p className="text-sm text-gray-600">Pair before/after photos and control ordering</p>
+        </div>
+        <div className="relative w-full md:w-80">
+          <svg className="w-4 h-4 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+          </svg>
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search caption or filename"
+            className="pl-10"
+          />
+        </div>
+      </div>
+
       {/* Upload Zone */}
       <div
         onDragOver={(e) => {
@@ -189,12 +212,34 @@ export default function TransformationsManager() {
         </div>
       )}
 
+      {loading && allItems.length === 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <Skeleton key={idx} className="h-44" />
+          ))}
+        </div>
+      )}
+
+      {!loading && allItems.length === 0 && (
+        <EmptyState
+          title="No transformation photos yet"
+          description="Upload after images to start pairing before/after transformations."
+          actionLabel="Upload after image"
+          onAction={() => {
+            const input = document.querySelector<HTMLInputElement>('input[type="file"]');
+            input?.click();
+          }}
+        />
+      )}
+
       {/* Transformation Pair Builder */}
       <TransformationPairBuilder
         allItems={allItems}
         transformations={transformations}
         onSave={onSave}
         loading={loading}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
       />
     </div>
   );

@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/Toast";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type FAQ = {
   id: string;
@@ -108,19 +111,30 @@ export default function FAQManager() {
   };
 
   if (loading) {
-    return <div className="text-sm text-gray-500">Loading FAQs...</div>;
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        {Array.from({ length: 4 }).map((_, idx) => (
+          <Skeleton key={idx} className="h-28" />
+        ))}
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">FAQs</h3>
-        <button
+        <Button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+          variant={showAddForm ? "secondary" : "primary"}
+          size="md"
         >
           {showAddForm ? "Cancel" : "+ Add FAQ"}
-        </button>
+        </Button>
       </div>
 
       {showAddForm && (
@@ -265,10 +279,18 @@ export default function FAQManager() {
             )}
           </div>
         ))}
-        {faqs.length === 0 && (
-          <div className="text-sm text-gray-500 text-center py-8">
-            No FAQs yet. Add your first one!
-          </div>
+        {faqs.length === 0 && !showAddForm && (
+          <EmptyState
+            title="No FAQs yet"
+            description="Add your first FAQ to help clients with common questions."
+            actionLabel="Add First FAQ"
+            onAction={() => setShowAddForm(true)}
+            icon={
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            }
+          />
         )}
       </div>
     </div>

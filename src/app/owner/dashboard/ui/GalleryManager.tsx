@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { useToast } from "@/components/Toast";
 import Image from "next/image";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type Item = { 
   name: string; 
@@ -12,6 +15,7 @@ type Item = {
   is_before_after?: boolean;
   before_image?: string | null;
   bucket?: string;
+  created_at?: string;
 };
 
 type DeleteConfirmation = {
@@ -51,6 +55,8 @@ export default function GalleryManager() {
   const [dragOverDropZone, setDragOverDropZone] = useState(false);
   const [uploadQueue, setUploadQueue] = useState<UploadFile[]>([]);
   const [showUploadPreview, setShowUploadPreview] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterMode, setFilterMode] = useState<"all" | "before" | "standard">("all");
   const [deleteConfirm, setDeleteConfirm] = useState<DeleteConfirmation>({
     isOpen: false,
     itemName: null,
@@ -262,6 +268,25 @@ export default function GalleryManager() {
     });
     setDraggingId(null);
   };
+
+  const filteredItems = items
+    .filter((it) => {
+      const q = searchTerm.trim().toLowerCase();
+      if (q) {
+        const inText = (it.caption || it.name || "").toLowerCase().includes(q);
+        const inTags = (it.tags || []).some((t) => t.toLowerCase().includes(q));
+        if (!inText && !inTags) return false;
+      }
+      if (filterMode === "before" && !it.is_before_after) return false;
+      if (filterMode === "standard" && it.is_before_after) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const ao = a.display_order ?? Number.MAX_SAFE_INTEGER;
+      const bo = b.display_order ?? Number.MAX_SAFE_INTEGER;
+      if (ao !== bo) return ao - bo;
+      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+    });
 
   const openBulkDelete = () => {
     if (selectedItems.size === 0) return;
@@ -479,14 +504,14 @@ export default function GalleryManager() {
 
   // Skeleton loader component
   const SkeletonCard = () => (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
-      <div className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300" />
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <Skeleton className="w-full h-48" />
       <div className="p-4 space-y-3">
-        <div className="h-3 bg-gray-200 rounded w-1/4" />
-        <div className="h-4 bg-gray-300 rounded w-3/4" />
+        <Skeleton className="h-3 w-1/4" />
+        <Skeleton className="h-4 w-3/4" />
         <div className="flex gap-2 mt-3">
-          <div className="h-6 bg-gray-200 rounded-full w-16" />
-          <div className="h-6 bg-gray-200 rounded-full w-20" />
+          <Skeleton className="h-6 w-16 rounded-full" />
+          <Skeleton className="h-6 w-20 rounded-full" />
         </div>
       </div>
     </div>
@@ -503,22 +528,26 @@ export default function GalleryManager() {
             {items.length > 0 && ` • ${items.length} image${items.length !== 1 ? 's' : ''}`}
           </p>
         </div>
-        <button
+        <Button
           onClick={refresh}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          variant="secondary"
+          size="md"
+          className="shadow-sm"
+          leftIcon={
+            <svg 
+              className={`w-4 h-4 text-gray-700 ${loading ? 'animate-spin' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          }
           title="Refresh gallery"
         >
-          <svg 
-            className={`w-4 h-4 text-gray-600 ${loading ? 'animate-spin' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          <span className="font-medium text-sm">Refresh</span>
-        </button>
+          Refresh
+        </Button>
       </div>
 
       {/* Upload Zone */}
@@ -755,30 +784,60 @@ export default function GalleryManager() {
         </div>
       )}
 
-      {selectedItems.size > 0 && (
-        <div className="flex items-center justify-between gap-3 p-4 bg-purple-50 border border-purple-100 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="px-3 py-1 bg-white rounded-lg border border-purple-100 text-sm font-semibold text-purple-700">
-              {selectedItems.size} selected
-            </div>
-            <p className="text-sm text-gray-700">Bulk actions for selected images</p>
+      {/* Filters and bulk bar */}
+      <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+        <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="relative flex-1">
+            <svg className="w-4 h-4 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+            </svg>
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by caption, filename, or tag"
+              className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+            />
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={clearSelection}
-              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50"
-            >
-              Clear
-            </button>
-            <button
-              onClick={openBulkDelete}
-              className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 shadow-sm"
-            >
-              Delete Selected
-            </button>
+          <div className="flex items-center gap-2">
+            {([
+              { key: "all", label: "All" },
+              { key: "standard", label: "Standard" },
+              { key: "before", label: "Before/After" },
+            ] as const).map((option) => (
+              <button
+                key={option.key}
+                onClick={() => setFilterMode(option.key)}
+                className={`px-3 py-2 text-sm font-medium rounded-xl border transition-colors ${
+                  filterMode === option.key
+                    ? "bg-purple-600 text-white border-purple-600 shadow"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
         </div>
-      )}
+
+        {selectedItems.size > 0 && (
+          <div className="flex items-center justify-between gap-3 p-3 bg-purple-50 border border-purple-100 rounded-2xl shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="px-3 py-1 bg-white rounded-lg border border-purple-100 text-sm font-semibold text-purple-700">
+                {selectedItems.size} selected
+              </div>
+              <p className="text-sm text-gray-700">Bulk actions for selected images</p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={clearSelection}>
+                Clear
+              </Button>
+              <Button variant="danger" size="sm" onClick={openBulkDelete}>
+                Delete Selected
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Status Messages */}
       {error && !loading && (
@@ -821,34 +880,44 @@ export default function GalleryManager() {
           </div>
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-16 px-4">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 mb-6">
-            <svg className="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">No images in your gallery</h3>
-          <p className="text-gray-600 mb-6 max-w-md mx-auto">
-            Start building your gallery by uploading your first image. Showcase your best work to attract clients!
-          </p>
-          <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-              </svg>
-              <span>Easy drag & drop</span>
+        <EmptyState
+          title="No images in your gallery"
+          description="Start building your gallery by uploading your first image. Showcase your best work to attract clients!"
+          actionLabel="Upload images"
+          onAction={() => {
+            const input = document.querySelector<HTMLInputElement>('input[type="file"][multiple]');
+            input?.click();
+          }}
+          secondaryAction={
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                </svg>
+                <span>Easy drag & drop</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                </svg>
+                <span>Add captions & tags</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-              </svg>
-              <span>Add captions & tags</span>
-            </div>
-          </div>
-        </div>
+          }
+        />
+      ) : filteredItems.length === 0 ? (
+        <EmptyState
+          title="No matches found"
+          description={`No images match your ${searchTerm ? 'search query' : 'filter'}. Try adjusting your filters or search.`}
+          actionLabel="Clear filters"
+          onAction={() => {
+            setSearchTerm("");
+            setFilterMode("all");
+          }}
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {items.map((it) => (
+          {filteredItems.map((it) => (
             <div 
               key={it.name} 
               draggable

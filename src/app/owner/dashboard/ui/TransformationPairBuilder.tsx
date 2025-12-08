@@ -2,6 +2,10 @@
 
 import React, { useState } from "react";
 import { useToast } from "@/components/Toast";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type Item = {
   name: string;
@@ -23,6 +27,8 @@ interface TransformationPairBuilderProps {
   transformations: Item[];
   onSave: (pair: TransformationPair) => Promise<void>;
   loading: boolean;
+  searchTerm: string;
+  onSearchChange: (val: string) => void;
 }
 
 export default function TransformationPairBuilder({
@@ -30,6 +36,8 @@ export default function TransformationPairBuilder({
   transformations,
   onSave,
   loading,
+  searchTerm,
+  onSearchChange,
 }: TransformationPairBuilderProps) {
   const [pairs, setPairs] = useState<TransformationPair[]>(
     transformations.map(t => ({
@@ -46,6 +54,24 @@ export default function TransformationPairBuilder({
   const availableItems = allItems.filter(
     item => !transformations.some(t => t.name === item.name)
   );
+
+  const filteredAvailable = availableItems.filter((item) => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (item.caption || "").toLowerCase().includes(q) ||
+      item.name.toLowerCase().includes(q)
+    );
+  });
+
+  const filteredPairs = pairs.filter((pair) => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return true;
+    const captionMatch = pair.caption.toLowerCase().includes(q);
+    const beforeMatch = pair.before?.name.toLowerCase().includes(q) || pair.before?.caption?.toLowerCase().includes(q);
+    const afterMatch = pair.after?.name.toLowerCase().includes(q) || pair.after?.caption?.toLowerCase().includes(q);
+    return captionMatch || beforeMatch || afterMatch;
+  });
 
   const handleDragStart = (item: Item, source: "before" | "after") => {
     setDraggedItem(item);
@@ -113,11 +139,18 @@ export default function TransformationPairBuilder({
   return (
     <div className="space-y-8">
       {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-900 mb-2">How to use</h3>
-        <p className="text-sm text-blue-800">
-          Drag photos from the gallery on the left to create before/after transformation pairs. Each card shows a side-by-side comparison that visitors will see on your site.
-        </p>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h3 className="font-semibold text-blue-900 mb-1">How to use</h3>
+          <p className="text-sm text-blue-800">
+            Drag photos to build before/after pairs. Save to publish a slider on the site.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-blue-900">
+          <span className="px-2 py-1 rounded-full bg-white border border-blue-200 font-semibold">Drag & Drop</span>
+          <span className="px-2 py-1 rounded-full bg-white border border-blue-200 font-semibold">Search</span>
+          <span className="px-2 py-1 rounded-full bg-white border border-blue-200 font-semibold">Preview</span>
+        </div>
       </div>
 
       {/* Main Layout: Gallery on Left, Pairs on Right */}
@@ -125,12 +158,28 @@ export default function TransformationPairBuilder({
         {/* Available Gallery */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sticky top-20 max-h-[calc(100vh-8rem)] overflow-y-auto">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Available Photos</h3>
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <h3 className="text-lg font-bold text-gray-900">Available Photos</h3>
+              <Input
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Search"
+                className="w-32 text-xs px-3 py-1.5"
+              />
+            </div>
             <div className="space-y-2">
-              {availableItems.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-8">Upload photos to gallery first</p>
+              {loading ? (
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <Skeleton key={idx} className="h-24" />
+                ))
+              ) : filteredAvailable.length === 0 ? (
+                <EmptyState
+                  title="No matches"
+                  description="Upload more before/after photos or adjust your search."
+                  className="bg-gray-50"
+                />
               ) : (
-                availableItems.map(item => (
+                filteredAvailable.map(item => (
                   <div
                     key={item.name}
                     draggable
@@ -160,22 +209,21 @@ export default function TransformationPairBuilder({
 
         {/* Transformation Pairs */}
         <div className="lg:col-span-9 space-y-4">
-          {pairs.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
-              <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16V4m0 0L3 8m4-4l4 4" />
-              </svg>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No transformation pairs yet</h3>
-              <p className="text-gray-600 mb-4">Create your first before/after pair</p>
-              <button
-                onClick={handleAddPair}
-                className="px-6 py-2.5 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all font-medium"
-              >
-                Create First Pair
-              </button>
+          {loading && pairs.length === 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <Skeleton key={idx} className="h-80" />
+              ))}
             </div>
+          ) : filteredPairs.length === 0 ? (
+            <EmptyState
+              title="No transformation pairs yet"
+              description="Create your first before/after pair to publish a slider on the site."
+              actionLabel="Create first pair"
+              onAction={handleAddPair}
+            />
           ) : (
-            pairs.map((pair, pairIndex) => (
+            filteredPairs.map((pair, pairIndex) => (
               <div
                 key={pairIndex}
                 className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-4 hover:shadow-md transition-shadow"
@@ -208,12 +256,13 @@ export default function TransformationPairBuilder({
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <button
+                          <Button
                             onClick={() => handleClearSlot(pairIndex, "before")}
-                            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded transition-colors"
+                            size="sm"
+                            variant="danger"
                           >
                             Clear
-                          </button>
+                          </Button>
                         </div>
                         <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs font-semibold text-gray-900">
                           Before
@@ -257,12 +306,13 @@ export default function TransformationPairBuilder({
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <button
+                          <Button
                             onClick={() => handleClearSlot(pairIndex, "after")}
-                            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded transition-colors"
+                            size="sm"
+                            variant="danger"
                           >
                             Clear
-                          </button>
+                          </Button>
                         </div>
                         <div className="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded text-xs font-semibold text-gray-900">
                           After
@@ -280,6 +330,21 @@ export default function TransformationPairBuilder({
                     )}
                   </div>
                 </div>
+
+                {pair.before && pair.after && (
+                  <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                    <div className="relative w-full aspect-[3/2]">
+                      <div className="absolute inset-0 grid grid-cols-2">
+                        <img src={pair.before.url} alt="Before" className="w-full h-full object-cover" />
+                        <img src={pair.after.url} alt="After" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30 flex items-center justify-between px-4 text-white text-sm font-semibold">
+                        <span>Before</span>
+                        <span>After</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Card Details */}
                 <div className="space-y-3 pt-2 border-t border-gray-100">
@@ -334,20 +399,22 @@ export default function TransformationPairBuilder({
 
                   {/* Actions */}
                   <div className="flex gap-2 pt-2">
-                    <button
+                    <Button
                       onClick={() => handleSavePair(pair, pairIndex)}
                       disabled={!pair.before || !pair.after || loading}
-                      className="flex-1 px-4 py-2.5 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                      loading={loading}
+                      className="flex-1"
                     >
-                      {loading ? "Saving..." : "Save Pair"}
-                    </button>
+                      Save Pair
+                    </Button>
                     {pairs.length > 1 && (
-                      <button
+                      <Button
                         onClick={() => handleRemovePair(pairIndex)}
-                        className="px-4 py-2.5 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium text-sm"
+                        variant="danger"
+                        size="md"
                       >
                         Remove
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -356,12 +423,13 @@ export default function TransformationPairBuilder({
           )}
 
           {pairs.length > 0 && (
-            <button
+            <Button
               onClick={handleAddPair}
-              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-pink-400 hover:bg-pink-50 transition-all text-gray-700 hover:text-pink-700 font-medium"
+              variant="ghost"
+              className="w-full border-2 border-dashed border-gray-300 hover:border-pink-400 hover:bg-pink-50 text-gray-700 hover:text-pink-700"
             >
               + Add Another Pair
-            </button>
+            </Button>
           )}
         </div>
       </div>
