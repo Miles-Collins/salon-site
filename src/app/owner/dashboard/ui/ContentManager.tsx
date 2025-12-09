@@ -16,28 +16,28 @@ type Content = {
   transformation_sliders?: TransformationSlide[];
 };
 
+const DEFAULT_SLIDERS: TransformationSlide[] = [
+  {
+    beforeImage: "/photo_1_before",
+    afterImage: "/photo_1_after",
+    beforeAlt: "Before hair transformation",
+    afterAlt: "After hair transformation",
+  },
+  {
+    beforeImage: "/gallery/2025-10-09.webp",
+    afterImage: "/gallery/2025-10-12.webp",
+    beforeAlt: "Before hair color transformation",
+    afterAlt: "After vivid hair color",
+  },
+];
+
 export default function ContentManager() {
   const [content, setContent] = useState<Content>({});
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const toast = useToast();
 
-  const defaultSliders: TransformationSlide[] = [
-    {
-      beforeImage: "/photo_1_before",
-      afterImage: "/photo_1_after",
-      beforeAlt: "Before hair transformation",
-      afterAlt: "After hair transformation",
-    },
-    {
-      beforeImage: "/gallery/2025-10-09.webp",
-      afterImage: "/gallery/2025-10-12.webp",
-      beforeAlt: "Before hair color transformation",
-      afterAlt: "After vivid hair color",
-    },
-  ];
-
-  const load = async () => {
+  const load = React.useCallback(async () => {
     setLoading(true);
     setMsg(null);
     try {
@@ -47,7 +47,7 @@ export default function ContentManager() {
       setContent({
         ...loaded,
         transformation_sliders:
-          loaded.transformation_sliders?.length ? loaded.transformation_sliders : defaultSliders,
+          loaded.transformation_sliders?.length ? loaded.transformation_sliders : DEFAULT_SLIDERS,
       });
       toast.info("Content loaded");
     } catch (e: any) {
@@ -56,9 +56,9 @@ export default function ContentManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const save = async (key: keyof Content) => {
     setLoading(true);
@@ -88,7 +88,7 @@ export default function ContentManager() {
     setContent((prev) => {
       const sliders = prev.transformation_sliders?.length
         ? [...prev.transformation_sliders]
-        : [...defaultSliders];
+        : [...DEFAULT_SLIDERS];
       sliders[idx] = { ...sliders[idx], ...patch } as TransformationSlide;
       return { ...prev, transformation_sliders: sliders };
     });
@@ -275,7 +275,7 @@ export default function ContentManager() {
         </div>
         <div className="p-6 space-y-4">
           {Array.from({ length: 2 }).map((_, idx) => {
-            const slide = content.transformation_sliders?.[idx] || defaultSliders[idx];
+            const slide = content.transformation_sliders?.[idx] || DEFAULT_SLIDERS[idx];
             return (
               <div key={idx} className="border border-gray-200 rounded-lg p-5 space-y-4 bg-gradient-to-br from-gray-50 to-white">
                 <h4 className="text-base font-semibold text-gray-900 flex items-center gap-2">

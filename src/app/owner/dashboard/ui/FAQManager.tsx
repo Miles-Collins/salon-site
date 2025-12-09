@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useToast } from "@/components/Toast";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -32,7 +32,7 @@ export default function FAQManager() {
     category: "",
   });
 
-  const loadFAQs = async () => {
+  const loadFAQs = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/owner/faqs/list");
@@ -45,11 +45,11 @@ export default function FAQManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     loadFAQs();
-  }, []);
+  }, [loadFAQs]);
 
   const handleAdd = async () => {
     try {

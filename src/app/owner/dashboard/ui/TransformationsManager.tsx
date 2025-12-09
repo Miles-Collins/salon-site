@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { useToast } from "@/components/Toast";
 import { Button } from "@/components/ui/Button";
@@ -27,7 +27,7 @@ export default function TransformationsManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const toast = useToast();
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -60,11 +60,11 @@ export default function TransformationsManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [refresh]);
 
   const onUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;

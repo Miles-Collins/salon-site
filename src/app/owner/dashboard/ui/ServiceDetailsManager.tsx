@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useToast } from "@/components/Toast";
 
 type ProcessStep = {
@@ -56,18 +56,18 @@ export default function ServiceDetailsManager() {
   });
   const toast = useToast();
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
-  async function fetchServices() {
+  const fetchServices = useCallback(async () => {
     const res = await fetch("/api/owner/service-details");
     if (res.ok) {
       const data = await res.json();
       setServices(data);
       toast.info("Services loaded");
     }
-  }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   function handleEdit(service: ServiceDetail) {
     setEditingId(service.id);

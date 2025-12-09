@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useToast } from "@/components/Toast";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
@@ -151,7 +151,7 @@ export default function GalleryManager() {
     toast.success("Deletion undone");
   };
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -171,11 +171,11 @@ export default function GalleryManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [refresh]);
 
   const markUnsaved = (name: string) => {
     setUnsavedChanges((prev) => new Set(prev).add(name));
