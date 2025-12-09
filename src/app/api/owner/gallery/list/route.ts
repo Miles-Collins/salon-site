@@ -38,6 +38,11 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to list gallery" }, { status: 500 });
   }
 
+  // Debug: log what we got from each bucket
+  console.log("Gallery items:", galleryRes.data?.length || 0, "error:", galleryRes.error?.message);
+  console.log("Transformations items:", transformationsRes.data?.length || 0, "error:", transformationsRes.error?.message);
+  console.log("Services items:", servicesRes.data?.length || 0, "error:", servicesRes.error?.message);
+
   const galleryPublicBase = supabase.storage.from(GALLERY_BUCKET).getPublicUrl("").data.publicUrl;
   const transformationsPublicBase = supabase.storage.from(TRANSFORMATIONS_BUCKET).getPublicUrl("").data.publicUrl;
   const servicesPublicBase = supabase.storage.from(SERVICES_BUCKET).getPublicUrl("").data.publicUrl;
