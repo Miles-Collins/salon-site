@@ -80,7 +80,7 @@ export async function GET() {
       return {
         name: f.name,
         created_at: (meta?.created_at as any) || (f as any).created_at,
-        url: `${publicBase}${encodeURIComponent(f.name)}`,
+        url: `${publicBase}${encodeURIComponent(f.name)}?format=origin`,
         caption: meta?.caption || null,
         tags: meta?.tags || [],
         display_order: meta?.display_order ?? null,
