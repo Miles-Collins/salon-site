@@ -10,6 +10,7 @@ type GalleryItem = {
   url: string;
   caption?: string | null;
   bucket?: string;
+  is_before_after?: boolean;
 };
 
 type GalleryBrowserModalProps = {
@@ -60,13 +61,19 @@ export default function GalleryBrowserModal({
 
   const filteredItems = items.filter((item) => {
     const q = searchTerm.trim().toLowerCase();
+    const effectiveBucket = (() => {
+      const raw = item.bucket?.toLowerCase();
+      if (raw) return raw;
+      if (item.is_before_after) return "gallery-transformations";
+      return "gallery";
+    })();
     const matchesSearch =
       !q || (item.caption || "").toLowerCase().includes(q) || item.name.toLowerCase().includes(q);
     const matchesBucket =
       filterBucket === "all" ||
-      (filterBucket === "gallery" && (!item.bucket || item.bucket === "gallery")) ||
-      (filterBucket === "services" && item.bucket === "gallery-services") ||
-      (filterBucket === "transformations" && item.bucket === "gallery-transformations");
+      (filterBucket === "gallery" && effectiveBucket === "gallery") ||
+      (filterBucket === "services" && effectiveBucket === "gallery-services") ||
+      (filterBucket === "transformations" && (effectiveBucket === "gallery-transformations" || effectiveBucket.includes("transform")));
     return matchesSearch && matchesBucket;
   });
 
