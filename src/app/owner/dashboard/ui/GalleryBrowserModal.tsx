@@ -47,10 +47,14 @@ export default function GalleryBrowserModal({
   }, [isOpen, focusSearch]);
 
   const loadGallery = async () => {
+    console.log("loadGallery called");
     setLoading(true);
     try {
+      console.log("Fetching /api/owner/gallery/list");
       const res = await fetch("/api/owner/gallery/list");
+      console.log("Response status:", res.status);
       const json = await res.json();
+      console.log("Gallery items received:", json.items?.length || 0);
       setItems(json.items || []);
     } catch (err) {
       console.error("Failed to load gallery:", err);
