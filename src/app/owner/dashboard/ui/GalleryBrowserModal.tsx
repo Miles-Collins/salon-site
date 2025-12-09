@@ -30,7 +30,7 @@ export default function GalleryBrowserModal({
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterBucket, setFilterBucket] = useState<"all" | "gallery" | "services">("all");
+  const [filterBucket, setFilterBucket] = useState<"all" | "gallery" | "services" | "transformations">("all");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -65,7 +65,8 @@ export default function GalleryBrowserModal({
     const matchesBucket =
       filterBucket === "all" ||
       (filterBucket === "gallery" && (!item.bucket || item.bucket === "gallery")) ||
-      (filterBucket === "services" && item.bucket === "gallery-services");
+      (filterBucket === "services" && item.bucket === "gallery-services") ||
+      (filterBucket === "transformations" && item.bucket === "gallery-transformations");
     return matchesSearch && matchesBucket;
   });
 
@@ -103,6 +104,9 @@ export default function GalleryBrowserModal({
             </Button>
             <Button size="sm" variant={filterBucket === "gallery" ? "primary" : "ghost"} onClick={() => setFilterBucket("gallery")}>
               Gallery
+            </Button>
+            <Button size="sm" variant={filterBucket === "transformations" ? "primary" : "ghost"} onClick={() => setFilterBucket("transformations")}>
+              Transformations
             </Button>
             <Button size="sm" variant={filterBucket === "services" ? "primary" : "ghost"} onClick={() => setFilterBucket("services")}>
               Services
