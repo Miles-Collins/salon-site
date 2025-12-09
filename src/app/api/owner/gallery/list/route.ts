@@ -57,15 +57,22 @@ export async function GET() {
     .select("name, caption, tags, display_order, created_at, is_before_after, before_image, bucket");
   const metaMap = new Map((metaRows || []).map((m) => [m.name, m]));
 
-  // If transformations bucket list is empty but metadata has transformation items, use metadata as source
-  let transformationItems = transformationsRes.data || [];
-  if (transformationItems.length === 0 && metaRows) {
-    const transformationMetaItems = metaRows.filter((m) => m.bucket === TRANSFORMATIONS_BUCKET);
-    if (transformationMetaItems.length > 0) {
-      console.log(`Transformations bucket list was empty, but found ${transformationMetaItems.length} items in metadata table`);
-      transformationItems = transformationMetaItems.map((m) => ({ name: m.name } as any));
+  // Merge storage results with any metadata rows for transformations to avoid missing items
+  const transformationItems = (() => {
+    const storageItems = transformationsRes.data || [];
+    const metaTransformation = (metaRows || []).filter((m) => m.bucket === TRANSFORMATIONS_BUCKET);
+    const combined = new Map<string, any>();
+    storageItems.forEach((f) => combined.set(f.name, { ...f, bucket: TRANSFORMATIONS_BUCKET }));
+    metaTransformation.forEach((m) => {
+      if (!combined.has(m.name)) {
+        combined.set(m.name, { name: m.name, bucket: TRANSFORMATIONS_BUCKET });
+      }
+    });
+    if (storageItems.length === 0 && metaTransformation.length > 0) {
+      console.log(`Transformations bucket list was empty; falling back to ${metaTransformation.length} metadata items`);
     }
-  }
+    return Array.from(combined.values());
+  })();
 
   const items = [
     ...(galleryRes.data || []).map((f) => ({ ...f, bucket: GALLERY_BUCKET })),
