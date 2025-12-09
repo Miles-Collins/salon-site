@@ -192,6 +192,10 @@ export default function TransformationPairBuilder({
                         src={item.url}
                         alt={item.caption || item.name}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%" y="50%" text-anchor="middle" dy=".3em"%3EImage%3C/text%3E%3C/svg%3E';
+                        }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                         <div className="opacity-0 group-hover:opacity-100 text-white text-xs font-semibold bg-black/70 px-2 py-1 rounded transition-opacity">
@@ -254,6 +258,7 @@ export default function TransformationPairBuilder({
                           src={pair.before.url}
                           alt="Before"
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                           <Button
@@ -304,6 +309,7 @@ export default function TransformationPairBuilder({
                           src={pair.after.url}
                           alt="After"
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                           <Button
@@ -335,8 +341,8 @@ export default function TransformationPairBuilder({
                   <div className="rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                     <div className="relative w-full aspect-[3/2]">
                       <div className="absolute inset-0 grid grid-cols-2">
-                        <img src={pair.before.url} alt="Before" className="w-full h-full object-cover" />
-                        <img src={pair.after.url} alt="After" className="w-full h-full object-cover" />
+                        <img src={pair.before.url} alt="Before" className="w-full h-full object-cover" loading="lazy" />
+                        <img src={pair.after.url} alt="After" className="w-full h-full object-cover" loading="lazy" />
                       </div>
                       <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30 flex items-center justify-between px-4 text-white text-sm font-semibold">
                         <span>Before</span>
