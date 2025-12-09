@@ -91,7 +91,7 @@ export default function GalleryPage() {
               aria-label={`View ${image.caption || image.alt}`}
             >
               <Image
-                src={supabaseThumb(image.src, 600, 70)}
+                src={image.src}
                 alt={image.alt}
                 fill
                 className={`object-cover transition-transform duration-500 group-hover:scale-110 ${
