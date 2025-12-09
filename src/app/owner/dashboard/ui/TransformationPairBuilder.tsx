@@ -51,6 +51,7 @@ export default function TransformationPairBuilder({
   const [draggedItem, setDraggedItem] = useState<Item | null>(null);
   const [dragSource, setDragSource] = useState<"before" | "after" | null>(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [focusSearch, setFocusSearch] = useState(false);
   const [selectingFor, setSelectingFor] = useState<{ pairIndex: number; slot: "before" | "after" } | null>(null);
   const toast = useToast();
 
@@ -99,6 +100,36 @@ export default function TransformationPairBuilder({
 
   const handleOpenGalleryBrowser = (pairIndex: number, slot: "before" | "after") => {
     setSelectingFor({ pairIndex, slot });
+    setFocusSearch(false);
+    setIsGalleryOpen(true);
+  };
+
+  const openGallery = (shouldFocusSearch: boolean) => {
+    // Pick an open slot if possible, otherwise default to the last pair's after slot
+    const nextTarget = (() => {
+      if (pairs.length === 0) return { pairIndex: 0, slot: "after" as const, needsNew: true };
+      const incompleteIndex = pairs.findIndex(p => !p.before || !p.after);
+      if (incompleteIndex !== -1) {
+        const slot: "before" | "after" = !pairs[incompleteIndex].before ? "before" : "after";
+        return { pairIndex: incompleteIndex, slot, needsNew: false };
+      }
+      return { pairIndex: pairs.length - 1, slot: "after" as const, needsNew: false };
+    })();
+
+    if (nextTarget.needsNew) {
+      setPairs(prev => [
+        ...prev,
+        {
+          before: null,
+          after: null,
+          caption: "",
+          display_order: prev.length,
+        },
+      ]);
+    }
+
+    setSelectingFor({ pairIndex: nextTarget.pairIndex, slot: nextTarget.slot });
+    setFocusSearch(shouldFocusSearch);
     setIsGalleryOpen(true);
   };
 
@@ -158,10 +189,30 @@ export default function TransformationPairBuilder({
         onClose={() => {
           setIsGalleryOpen(false);
           setSelectingFor(null);
+          setFocusSearch(false);
         }}
         onSelect={handleGallerySelect}
         title={selectingFor ? `Select ${selectingFor.slot === "before" ? "Before" : "After"} Image` : "Select Image"}
+        focusSearch={focusSearch}
       />
+
+      {/* Controls */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <Input
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Filter pairs by caption or filename"
+          className="md:max-w-md"
+        />
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => openGallery(false)}>
+            Browse Gallery
+          </Button>
+          <Button onClick={() => openGallery(true)}>
+            Search
+          </Button>
+        </div>
+      </div>
 
       {/* Instructions */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

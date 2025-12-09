@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -18,6 +17,7 @@ type GalleryBrowserModalProps = {
   onClose: () => void;
   onSelect: (item: GalleryItem) => void;
   title?: string;
+  focusSearch?: boolean;
 };
 
 export default function GalleryBrowserModal({
@@ -25,17 +25,25 @@ export default function GalleryBrowserModal({
   onClose,
   onSelect,
   title = "Select Image",
+  focusSearch = false,
 }: GalleryBrowserModalProps) {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterBucket, setFilterBucket] = useState<"all" | "gallery" | "services">("gallery");
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       loadGallery();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && focusSearch) {
+      requestAnimationFrame(() => searchInputRef.current?.focus());
+    }
+  }, [isOpen, focusSearch]);
 
   const loadGallery = async () => {
     setLoading(true);
@@ -52,14 +60,12 @@ export default function GalleryBrowserModal({
 
   const filteredItems = items.filter((item) => {
     const q = searchTerm.trim().toLowerCase();
-    const matchesSearch = !q || 
-      (item.caption || "").toLowerCase().includes(q) ||
-      item.name.toLowerCase().includes(q);
-    
-    const matchesBucket = filterBucket === "all" ||
+    const matchesSearch =
+      !q || (item.caption || "").toLowerCase().includes(q) || item.name.toLowerCase().includes(q);
+    const matchesBucket =
+      filterBucket === "all" ||
       (filterBucket === "gallery" && (!item.bucket || item.bucket === "gallery")) ||
       (filterBucket === "services" && item.bucket === "gallery-services");
-    
     return matchesSearch && matchesBucket;
   });
 
@@ -74,6 +80,7 @@ export default function GalleryBrowserModal({
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Close gallery browser"
           >
             <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -83,32 +90,21 @@ export default function GalleryBrowserModal({
 
         {/* Filters */}
         <div className="px-6 py-4 border-b border-gray-100 space-y-3">
-          <Input
+          <input
+            ref={searchInputRef}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by filename or caption..."
-            className="w-full"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
           />
           <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant={filterBucket === "all" ? "primary" : "ghost"}
-              onClick={() => setFilterBucket("all")}
-            >
+            <Button size="sm" variant={filterBucket === "all" ? "primary" : "ghost"} onClick={() => setFilterBucket("all")}>
               All Images
             </Button>
-            <Button
-              size="sm"
-              variant={filterBucket === "gallery" ? "primary" : "ghost"}
-              onClick={() => setFilterBucket("gallery")}
-            >
+            <Button size="sm" variant={filterBucket === "gallery" ? "primary" : "ghost"} onClick={() => setFilterBucket("gallery")}>
               Gallery
             </Button>
-            <Button
-              size="sm"
-              variant={filterBucket === "services" ? "primary" : "ghost"}
-              onClick={() => setFilterBucket("services")}
-            >
+            <Button size="sm" variant={filterBucket === "services" ? "primary" : "ghost"} onClick={() => setFilterBucket("services")}>
               Services
             </Button>
           </div>
@@ -151,9 +147,7 @@ export default function GalleryBrowserModal({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="absolute bottom-0 left-0 right-0 p-3">
-                      <p className="text-white text-xs font-medium truncate">
-                        {item.caption || item.name}
-                      </p>
+                      <p className="text-white text-xs font-medium truncate">{item.caption || item.name}</p>
                     </div>
                   </div>
                   <div className="absolute top-2 right-2 bg-purple-600 text-white px-2 py-1 rounded-lg text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
