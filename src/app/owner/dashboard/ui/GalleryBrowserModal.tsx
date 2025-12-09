@@ -30,7 +30,7 @@ export default function GalleryBrowserModal({
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterBucket, setFilterBucket] = useState<"all" | "gallery" | "services">("gallery");
+  const [filterBucket, setFilterBucket] = useState<"all" | "gallery" | "services">("all");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
