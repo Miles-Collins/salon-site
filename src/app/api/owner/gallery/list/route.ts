@@ -98,7 +98,7 @@ export async function GET() {
         bucket: bucketName,
       };
     })
-    .filter(Boolean)
+    .filter((v): v is NonNullable<typeof v> => Boolean(v))
     .sort((a, b) => {
       const ao = a.display_order ?? Number.MAX_SAFE_INTEGER;
       const bo = b.display_order ?? Number.MAX_SAFE_INTEGER;
