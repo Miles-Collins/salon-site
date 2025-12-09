@@ -47,6 +47,10 @@ export async function GET() {
   const transformationsPublicBase = supabase.storage.from(TRANSFORMATIONS_BUCKET).getPublicUrl("").data.publicUrl;
   const servicesPublicBase = supabase.storage.from(SERVICES_BUCKET).getPublicUrl("").data.publicUrl;
 
+  const galleryNames = new Set((galleryRes.data || []).map((f) => f.name));
+  const transformationNames = new Set((transformationsRes.data || []).map((f) => f.name));
+  const serviceNames = new Set((servicesRes.data || []).map((f) => f.name));
+
   // Fetch metadata rows
   const { data: metaRows } = await supabase
     .from("gallery_images")
@@ -73,6 +77,11 @@ export async function GET() {
     .map((f: any) => {
       const meta = metaMap.get(f.name);
       const bucketName = meta?.bucket || f.bucket;
+
+      // If the storage listing doesn’t have this file for gallery/services, skip it to avoid 404s
+      if (bucketName === GALLERY_BUCKET && !galleryNames.has(f.name)) return null;
+      if (bucketName === SERVICES_BUCKET && !serviceNames.has(f.name)) return null;
+
       let publicBase = galleryPublicBase;
       if (bucketName === TRANSFORMATIONS_BUCKET) publicBase = transformationsPublicBase;
       if (bucketName === SERVICES_BUCKET) publicBase = servicesPublicBase;
@@ -89,6 +98,7 @@ export async function GET() {
         bucket: bucketName,
       };
     })
+    .filter(Boolean)
     .sort((a, b) => {
       const ao = a.display_order ?? Number.MAX_SAFE_INTEGER;
       const bo = b.display_order ?? Number.MAX_SAFE_INTEGER;
