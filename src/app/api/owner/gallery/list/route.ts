@@ -53,9 +53,19 @@ export async function GET() {
     .select("name, caption, tags, display_order, created_at, is_before_after, before_image, bucket");
   const metaMap = new Map((metaRows || []).map((m) => [m.name, m]));
 
+  // If transformations bucket list is empty but metadata has transformation items, use metadata as source
+  let transformationItems = transformationsRes.data || [];
+  if (transformationItems.length === 0 && metaRows) {
+    const transformationMetaItems = metaRows.filter((m) => m.bucket === TRANSFORMATIONS_BUCKET);
+    if (transformationMetaItems.length > 0) {
+      console.log(`Transformations bucket list was empty, but found ${transformationMetaItems.length} items in metadata table`);
+      transformationItems = transformationMetaItems.map((m) => ({ name: m.name }));
+    }
+  }
+
   const items = [
     ...(galleryRes.data || []).map((f) => ({ ...f, bucket: GALLERY_BUCKET })),
-    ...(transformationsRes.data || []).map((f) => ({ ...f, bucket: TRANSFORMATIONS_BUCKET })),
+    ...transformationItems.map((f) => ({ ...f, bucket: TRANSFORMATIONS_BUCKET })),
     ...(servicesRes.data || []).map((f) => ({ ...f, bucket: SERVICES_BUCKET })),
   ]
     // ignore storage helper files
@@ -70,7 +80,7 @@ export async function GET() {
       return {
         name: f.name,
         created_at: (meta?.created_at as any) || (f as any).created_at,
-        url: `${publicBase}/${encodeURIComponent(f.name)}`,
+        url: `${publicBase}${encodeURIComponent(f.name)}`,
         caption: meta?.caption || null,
         tags: meta?.tags || [],
         display_order: meta?.display_order ?? null,
