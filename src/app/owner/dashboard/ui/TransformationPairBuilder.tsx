@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import GalleryBrowserModal from "./GalleryBrowserModal";
 
 type Item = {
   name: string;
@@ -49,6 +50,8 @@ export default function TransformationPairBuilder({
   );
   const [draggedItem, setDraggedItem] = useState<Item | null>(null);
   const [dragSource, setDragSource] = useState<"before" | "after" | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [selectingFor, setSelectingFor] = useState<{ pairIndex: number; slot: "before" | "after" } | null>(null);
   const toast = useToast();
 
   const availableItems = allItems.filter(
@@ -92,6 +95,18 @@ export default function TransformationPairBuilder({
       };
       return newPairs;
     });
+  };
+
+  const handleOpenGalleryBrowser = (pairIndex: number, slot: "before" | "after") => {
+    setSelectingFor({ pairIndex, slot });
+    setIsGalleryOpen(true);
+  };
+
+  const handleGallerySelect = (item: any) => {
+    if (selectingFor) {
+      handleDropOnSlot(selectingFor.pairIndex, selectingFor.slot, item);
+      setSelectingFor(null);
+    }
   };
 
   const handleClearSlot = (pairIndex: number, slot: "before" | "after") => {
@@ -138,81 +153,35 @@ export default function TransformationPairBuilder({
 
   return (
     <div className="space-y-8">
+      <GalleryBrowserModal
+        isOpen={isGalleryOpen}
+        onClose={() => {
+          setIsGalleryOpen(false);
+          setSelectingFor(null);
+        }}
+        onSelect={handleGallerySelect}
+        title={selectingFor ? `Select ${selectingFor.slot === "before" ? "Before" : "After"} Image` : "Select Image"}
+      />
+
       {/* Instructions */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h3 className="font-semibold text-blue-900 mb-1">How to use</h3>
           <p className="text-sm text-blue-800">
-            Drag photos to build before/after pairs. Save to publish a slider on the site.
+            Click the slots below to browse and select before/after photos. Save to publish a slider on the site.
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-blue-900">
-          <span className="px-2 py-1 rounded-full bg-white border border-blue-200 font-semibold">Drag & Drop</span>
+          <span className="px-2 py-1 rounded-full bg-white border border-blue-200 font-semibold">Browse Gallery</span>
           <span className="px-2 py-1 rounded-full bg-white border border-blue-200 font-semibold">Search</span>
           <span className="px-2 py-1 rounded-full bg-white border border-blue-200 font-semibold">Preview</span>
         </div>
       </div>
 
-      {/* Main Layout: Gallery on Left, Pairs on Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Available Gallery */}
-        <div className="lg:col-span-3">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sticky top-20 max-h-[calc(100vh-8rem)] overflow-y-auto">
-            <div className="flex items-center justify-between gap-2 mb-3">
-              <h3 className="text-lg font-bold text-gray-900">Available Photos</h3>
-              <Input
-                value={searchTerm}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Search"
-                className="w-32 text-xs px-3 py-1.5"
-              />
-            </div>
-            <div className="space-y-2">
-              {loading ? (
-                Array.from({ length: 5 }).map((_, idx) => (
-                  <Skeleton key={idx} className="h-24" />
-                ))
-              ) : filteredAvailable.length === 0 ? (
-                <EmptyState
-                  title="No matches"
-                  description="Upload more before/after photos or adjust your search."
-                  className="bg-gray-50"
-                />
-              ) : (
-                filteredAvailable.map(item => (
-                  <div
-                    key={item.name}
-                    draggable
-                    onDragStart={() => handleDragStart(item, "before")}
-                    onDragEnd={handleDragEnd}
-                    className="group cursor-move"
-                  >
-                    <div className="relative h-24 bg-gray-100 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 hover:border-purple-400 transition-all hover:shadow-md">
-                      <img
-                        src={item.url}
-                        alt={item.caption || item.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%" y="50%" text-anchor="middle" dy=".3em"%3EImage%3C/text%3E%3C/svg%3E';
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                        <div className="opacity-0 group-hover:opacity-100 text-white text-xs font-semibold bg-black/70 px-2 py-1 rounded transition-opacity">
-                          Drag to use
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600 mt-1 truncate">{item.caption || item.name}</p>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-
+      {/* Main Layout */}
+      <div className="grid grid-cols-1 gap-6">
         {/* Transformation Pairs */}
-        <div className="lg:col-span-9 space-y-4">
+        <div className="space-y-4">
           {loading && pairs.length === 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Array.from({ length: 4 }).map((_, idx) => (
@@ -260,13 +229,12 @@ export default function TransformationPairBuilder({
                           className="w-full h-full object-cover"
                           loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <Button
-                            onClick={() => handleClearSlot(pairIndex, "before")}
-                            size="sm"
-                            variant="danger"
-                          >
-                            Clear
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                          <Button onClick={() => handleOpenGalleryBrowser(pairIndex, "before")} size="sm" variant="secondary">
+                            Change
+                          </Button>
+                          <Button onClick={() => handleClearSlot(pairIndex, "before")} size="sm" variant="danger">
+                            Remove
                           </Button>
                         </div>
                         <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs font-semibold text-gray-900">
@@ -274,14 +242,17 @@ export default function TransformationPairBuilder({
                         </div>
                       </>
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
+                      <button 
+                        onClick={() => handleOpenGalleryBrowser(pairIndex, "before")}
+                        className="absolute inset-0 flex items-center justify-center hover:bg-purple-50 transition-colors"
+                      >
                         <div className="text-center">
-                          <svg className="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="mx-auto h-8 w-8 text-purple-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                           </svg>
-                          <p className="text-sm font-medium text-gray-600">Drag before photo</p>
+                          <p className="text-sm font-semibold text-purple-600">Select Before Photo</p>
                         </div>
-                      </div>
+                      </button>
                     )}
                   </div>
 
@@ -311,13 +282,12 @@ export default function TransformationPairBuilder({
                           className="w-full h-full object-cover"
                           loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <Button
-                            onClick={() => handleClearSlot(pairIndex, "after")}
-                            size="sm"
-                            variant="danger"
-                          >
-                            Clear
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                          <Button onClick={() => handleOpenGalleryBrowser(pairIndex, "after")} size="sm" variant="secondary">
+                            Change
+                          </Button>
+                          <Button onClick={() => handleClearSlot(pairIndex, "after")} size="sm" variant="danger">
+                            Remove
                           </Button>
                         </div>
                         <div className="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded text-xs font-semibold text-gray-900">
@@ -325,14 +295,17 @@ export default function TransformationPairBuilder({
                         </div>
                       </>
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
+                      <button 
+                        onClick={() => handleOpenGalleryBrowser(pairIndex, "after")}
+                        className="absolute inset-0 flex items-center justify-center hover:bg-rose-50 transition-colors"
+                      >
                         <div className="text-center">
-                          <svg className="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="mx-auto h-8 w-8 text-rose-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                           </svg>
-                          <p className="text-sm font-medium text-gray-600">Drag after photo</p>
+                          <p className="text-sm font-semibold text-rose-600">Select After Photo</p>
                         </div>
-                      </div>
+                      </button>
                     )}
                   </div>
                 </div>
