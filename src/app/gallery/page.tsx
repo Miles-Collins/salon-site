@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import ImageLightbox from "@/components/ImageLightbox";
-import { supabaseThumb } from "@/lib/image";
 
 // Gallery images from Gatsby Studios
 type GItem = { src: string; alt: string; span?: string; caption?: string | null; display_order?: number | null; created_at?: string };
