@@ -59,7 +59,7 @@ export async function GET() {
     const transformationMetaItems = metaRows.filter((m) => m.bucket === TRANSFORMATIONS_BUCKET);
     if (transformationMetaItems.length > 0) {
       console.log(`Transformations bucket list was empty, but found ${transformationMetaItems.length} items in metadata table`);
-      transformationItems = transformationMetaItems.map((m) => ({ name: m.name }));
+      transformationItems = transformationMetaItems.map((m) => ({ name: m.name } as any));
     }
   }
 
